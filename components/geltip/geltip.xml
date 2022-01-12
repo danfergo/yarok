@@ -1,0 +1,34 @@
+<mujoco>
+    <asset>
+        <material name="white_elastomer" rgba="1 1 1 1"/>
+        <material name="black_plastic" rgba=".3 .3 .3 1"/>
+
+        <mesh name="geltip_shell" file="meshes/shell_open.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="geltip_sleeve" file="meshes/sleeve_open.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="geltip_mount" file="meshes/mount.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="geltip_glass" file="meshes/glass_long.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="geltip_elastomer" file="meshes/elastomer_long.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="geltip_elastomer_inv" file="meshes/elastomer_long_inv.stl" scale="0.001 0.001 0.001"/>
+
+    </asset>
+    <worldbody>
+        <body name="geltip">
+
+            <joint name="a2"
+                   type="hinge"
+                   armature="1"
+                   frictionloss="100"
+                   axis="0 0 1"/>
+
+            <geom density="0.1" type="mesh" mesh="geltip_shell" material="black_plastic"/>
+            <geom density="0.1" type="mesh" mesh="geltip_sleeve" material="black_plastic"/>
+            <geom density="0.1" type="mesh" mesh="geltip_mount" material="black_plastic"/>
+            <geom density="0.1" type="mesh" mesh="geltip_elastomer" material="white_elastomer"
+                  contype="0" conaffinity="0"/>
+            <geom density="0.1" type="mesh" mesh="geltip_elastomer_inv" material="white_elastomer"
+                  contype="0" conaffinity="0"/>
+
+            <cam name="geltip" pos="0 0 0.01" zaxis="0 0 -1" fovy="70"/>
+        </body>
+    </worldbody>
+</mujoco>

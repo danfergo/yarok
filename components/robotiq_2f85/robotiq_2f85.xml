@@ -1,0 +1,130 @@
+<!-- 
+    UR5 Model taken from here:
+    https://github.com/abr/abr_control/blob/master/abr_control/arms/ur5/ur5.xml
+    
+    2F-85 Gripper stls taken from here:
+    https://robotiq.com/
+-->
+
+<mujoco model="Gripper">
+    <asset>
+        <material name="black_resin" rgba="0.1 0.1 0.1 1"/>
+        <material name="silver" specular="1" shininess="0.5" reflectance="1" emission="0.25" rgba="0.82 0.82 0.82 1"/>
+
+        <!-- gripper model (linked joints)-->
+        <mesh name="base0" file="meshes/base0.stl" scale="0.001 0.001 0.001"/>
+        <!-- lhs -->
+        <mesh name="grip_finger01" file="meshes/finger01.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger02" file="meshes/finger02.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger03" file="meshes/finger03.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger04" file="meshes/finger04.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger0tip" file="meshes/finger0tip.stl" scale="0.001 0.001 0.001"/>
+        <!-- rhs -->
+        <mesh name="grip_finger11" file="meshes/finger11.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger12" file="meshes/finger12.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger13" file="meshes/finger13.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger14" file="meshes/finger14.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="grip_finger1tip" file="meshes/finger1tip.stl" scale="0.001 0.001 0.001"/>
+
+    </asset>
+    <worldbody>
+        <!-- gripper model-->
+        <body name="gripper_structure" pos="-0.03 0 -0.0935" euler="0 0 1.5708">
+
+            <body name="gripper_base" pos="0 0 0" euler="0 0 0">
+                <site name="grip" pos="0 0.165 0.1" rgba="1 0 1 0" size="0.02 0.02 0.02"/>
+                <geom name="gripper base" type="mesh" material="black_resin" mesh="base0" mass="0.050" contype="32"
+                      conaffinity="32"/>
+
+                <!-- LHS -->
+                <body name="f1" pos="0 0 0">
+                    <joint name="finger0_joint0" type="hinge" pos="-0.030 0.05 0.095" axis="0 0 1"
+                           limited="true" range="-0.2 0.1" stiffness=".02" springref="3" frictionloss="1"
+                           damping=".002"/>
+                    <geom type="mesh" material="silver" mesh="grip_finger01" mass="0.050" contype="32"
+                          conaffinity="32"/>
+
+                    <body name="f2" pos="0 0 0">
+                        <geom name="g_f2" type="mesh" material="black_resin" mesh="grip_finger02" mass="0.050"
+                              contype="32" conaffinity="32"/>
+                    </body>
+                </body>
+
+                <body name="f3" pos="0 0 0">
+                    <joint name="finger0_joint4" type="hinge" pos="-0.012 0.06 0.095" axis="0 0 1"
+                           stiffness=".02" springref="2" limited="true" range="-1.2 .2"/>
+                    <geom type="mesh" material="black_resin" mesh="grip_finger03" mass="0.050" contype="32"
+                          conaffinity="32"/>
+
+                    <body name="f4" pos="0 0 0.0005">
+                        <joint name="finger0_joint3" type="hinge" pos="-0.050 0.105 0.0935" axis="0 0 1"
+                               stiffness=".02" springref="2"/>
+                        <geom name="g_f4" type="mesh" material="silver" mesh="grip_finger04" mass="0.050" contype="32"
+                              conaffinity="32"/>
+
+                        <body name="tip" pos="0 0 0">
+
+                            <!-- Gelsight Sensor -->
+                            <body name="gelsight_0" pos="-0.0765 0.1612 0.0942" euler="0 1.5708 -1.5708">
+                                <!--                            <include file="textures/gelsight2014.xml"/>-->
+                            </body>
+                        </body>
+                    </body>
+                </body>
+
+                <!-- RHS -->
+                <body name="f1_1" pos="0 0 0">
+                    <joint name="finger1_joint0" type="hinge" pos="0.030 0.05 0.095" axis="0 0 1" limited="true"
+                           range="-0.1 0.2" stiffness=".02" springref="-3" frictionloss="1" damping=".002"/>
+                    <geom type="mesh" material="silver" mesh="grip_finger11" mass="0.050" contype="32"
+                          conaffinity="32"/>
+
+                    <body name="f2_1" pos="0 0 0">
+                        <geom name="g_f2_1" type="mesh" material="black_resin" mesh="grip_finger12" mass="0.050"
+                              contype="32" conaffinity="32"/>
+                    </body>
+                </body>
+
+                <body name="f3_1" pos="0 0 0">
+
+                    <joint name="finger1_joint4" type="hinge" pos="0.012 0.06 0.095" axis="0 0 1"
+                           stiffness=".02" springref="-2" limited="true" range="-.2 1.2"/>
+                    <geom type="mesh" material="black_resin" mesh="grip_finger13" mass="0.050" contype="32"
+                          conaffinity="32"/>
+
+                    <body name="f4_1" pos="0 0 0">
+                        <joint name="finger1_joint3" type="hinge" pos="0.050 0.105 0.0935" axis="0 0 1"
+                               stiffness=".02" springref="-2"/>
+                        <geom name="g_f4_1" type="mesh" material="silver" mesh="grip_finger14" mass="0.050" contype="32"
+                              conaffinity="32"/>
+
+                        <body name="tip_1" pos="0 0 0">
+
+                            <!-- Gelsight Sensor -->
+                            <body name="gelsight_1" pos="0.0765 0.1612 0.095" euler="0 -1.5708 -1.5708">
+                                <!--                            <include file="textures/gelsight_mountable1.xml"/>-->
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <!--    Joints requiring a child body to have two parents-->
+    <equality>
+        <!-- LHS -->
+        <connect name="f2_to_f4" active="true" body1="f2" body2="f4" anchor="-0.069 0.098 .0935" solref="0.01 7"
+                 solimp="1 1 0.5 1 1"/>
+        <!-- RHS -->
+        <connect name="f2_to_f4_1" active="true" body1="f2_1" body2="f4_1" anchor="0.069 0.098 .0935" solref="0.01 7"
+                 solimp="1 1 0.5 1 1"/>
+    </equality>
+
+    <actuator>
+        <!--         Gripper Joints -->
+        <motor gear="100" name="finger0_joint1_motor" joint="finger0_joint0" ctrllimited="true"
+               ctrlrange="-0.03 0.03" forcelimited="true" forcerange="-0.03 0.03"/>
+        <motor gear="100" name="finger1_joint1_motor" joint="finger1_joint0" ctrllimited="true"
+               ctrlrange="-0.03 0.03" forcelimited="true" forcerange="-0.03 0.03"/>
+    </actuator>
+</mujoco>

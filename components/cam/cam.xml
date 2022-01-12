@@ -1,0 +1,7 @@
+<mujoco>
+    <worldbody>
+        <body>
+            <camera name="cam"/>
+        </body>
+    </worldbody>
+</mujoco>

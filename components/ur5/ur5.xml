@@ -1,0 +1,154 @@
+<mujoco>
+    <asset>
+        <!-- arm models -->
+        <mesh name="link0" file="meshes/link0.stl"/>
+        <mesh name="link1" file="meshes/link1.stl"/>
+        <mesh name="link1_cap" file="meshes/link1_cap.stl"/>
+        <mesh name="link1_connector" file="meshes/link1_connector.stl"/>
+        <mesh name="link2" file="meshes/link2.stl"/>
+        <mesh name="link2_tube" file="meshes/link2_tube.stl"/>
+        <mesh name="link2_cap" file="meshes/link2_cap.stl"/>
+        <mesh name="link2_connector" file="meshes/link2_connector.stl"/>
+        <mesh name="link3a" file="meshes/link3a.stl"/>
+        <mesh name="link3a_connector" file="meshes/link3a_connector.stl"/>
+        <mesh name="link3_tube" file="meshes/link3_tube.stl"/>
+        <mesh name="link3_cap" file="meshes/link3_cap.stl"/>
+        <mesh name="link3b" file="meshes/link3b.stl"/>
+        <mesh name="link3b_connector" file="meshes/link3b_connector.stl"/>
+        <mesh name="link3b_connector2" file="meshes/link3b_connector2.stl"/>
+        <mesh name="link4" file="meshes/link4.stl"/>
+        <mesh name="link4_cap" file="meshes/link4_cap.stl"/>
+        <mesh name="link4_connector" file="meshes/link4_connector.stl"/>
+        <mesh name="link5" file="meshes/link5.stl"/>
+        <mesh name="link5_cap" file="meshes/link5_cap.stl"/>
+        <mesh name="link5_connector" file="meshes/link5_connector.stl"/>
+        <mesh name="link6" file="meshes/link6.stl"/>
+        <mesh name="link6_connector" file="meshes/link6_connector.stl"/>
+
+        <!-- materials -->
+        <material name="black" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.2 0.2 0.2 1"/>
+        <material name="grey" specular="1" shininess="0.5" reflectance="1" emission="0.1" rgba="0.5 0.5 0.5 1"/>
+        <material name="blue" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.678 0.847 0.902 1"/>
+        <material name="silver" specular="1" shininess="0.5" reflectance="1" emission="0.25" rgba="0.82 0.82 0.82 1"/>
+
+    </asset>
+    <worldbody>
+        <body name="base_link" pos="0 0 0">
+            <geom name="link0" type="mesh" mesh="link0" pos="0 0 0" conaffinity="32" contype="32"/>
+
+            <!--         euler="0 0 -1.5708"-->
+            <body name="link1" pos="0 0 0.0213">
+                <joint name="joint0" axis="0 0 1" pos="0 0 0" limited="true" range="-6.28319 6.28319"
+                       armature="100" frictionloss="100"/>
+                <inertial pos="0 -0.02561 0.00193" mass="0.03761" diaginertia="0.1 0.1 0.1"/>
+                <geom name="link1_connector" type="mesh" mesh="link1_connector" pos="0 0 0" material="black"
+                      conaffinity="32" contype="32"/>
+                <geom name="link1" type="mesh" mesh="link1" pos="0 0 0.008" material="grey" conaffinity="32"
+                      contype="32"/>
+                <geom name="link1_cap" type="mesh" mesh="link1_cap" pos="0 0 .1025" material="blue" conaffinity="32"
+                      contype="32"/>
+
+                <!--            euler="-.9 0 0"-->
+                <body name="link2" pos="-0.0663 0 0.0679" euler="-1.5708 0 0">
+                    <joint name="joint1" axis="-1 0 0" pos="0 0 0" limited="true" range="-6.28319 6.28319"
+                           armature="100" frictionloss="100"/>
+                    <inertial pos="-0.04706 0 0.2125" mass="0.08058" diaginertia="0.1 0.1 0.1"/>
+                    <geom name="link2_connector" type="mesh" mesh="link2_connector" pos="0 0 0" material="black"
+                          conaffinity="32" contype="32"/>
+                    <geom name="link2" type="mesh" mesh="link2" pos="-0.008 0 0" material="grey" conaffinity="32"
+                          contype="32"/>
+                    <geom name="link2_cap" type="mesh" mesh="link2_cap" pos="-0.1015 0 -0.0025" material="blue"
+                          conaffinity="32" contype="32"/>
+                    <geom name="link2_tube" type="mesh" mesh="link2_tube" pos="-0.0679 0 0.066" material="silver"
+                          contype="32" conaffinity="32"/>
+
+                    <!--euler="2.7 0 0"-->
+                    <body name="link3" pos="-0.008 0 0.425">
+                        <joint name="joint2" axis="1 0 0" pos="0 0 0" limited="true" range="-6.28319 6.28319"
+                               armature="100" frictionloss="100"/>
+                        <inertial pos="0.0478 0 0.15" mass="0.02846" diaginertia="0.1 0.1 0.1"/>
+                        <geom name="link3a_connector" type="mesh" mesh="link3a_connector" pos="0 0 0" material="black"
+                              conaffinity="32" contype="32"/>
+                        <geom name="link3a" type="mesh" mesh="link3a" pos="0.008 0 0" material="grey"/>
+                        <geom name="link3_tube" type="mesh" mesh="link3_tube" pos="0.059 0 0.066" material="silver"
+                              contype="32" conaffinity="32"/>
+                        <geom name="link3b_connector" type="mesh" mesh="link3b_connector" pos="0.059 0 0.3418"
+                              material="black"/>
+                        <geom name="link3b_connector2" type="mesh" mesh="link3b_connector2" pos="0.059 0 0.34"
+                              material="grey" conaffinity="32" contype="32"/>
+                        <geom name="link3b" type="mesh" mesh="link3b" pos="0.059 0 0.347" material="grey"
+                              conaffinity="32"
+                              contype="32"/>
+                        <geom name="link3_cap" type="mesh" mesh="link3_cap" pos="0.0837 0 0.392" material="blue"
+                              conaffinity="32" contype="32"/>
+
+                        <!--                    euler="-0.25 0 0"-->
+                        <body name="link4" pos="0.0173 0 0.3922">
+                            <joint name="joint3" axis="-1 0 0" pos="0 0 0" limited="true" range="-6.28319 6.28319"
+                                   armature="100" frictionloss="100"/>
+                            <inertial pos="-0.05796 -0.0018 0" mass="0.0137" diaginertia="0.1 0.1 0.1"/>
+                            <geom name="link4_connector" type="mesh" mesh="link4_connector" pos="0 0 0" material="black"
+                                  conaffinity="32" contype="32"/>
+                            <geom name="link4" type="mesh" mesh="link4" pos="-0.008 0 0" material="grey"
+                                  conaffinity="32"
+                                  contype="32"/>
+                            <geom name="link4_cap" type="mesh" mesh="link4_cap" pos="-0.05325 0 -0.0247" material="blue"
+                                  conaffinity="32" contype="32"/>
+
+                            <!--                         euler="0 0 1.5708"-->
+                            <body name="link5" pos="-0.05325 0 0.04165">
+                                <joint name="joint4" axis="0 0 1" pos="0 0 0" limited="true"
+                                       range="-6.28319 6.28319"
+                                       armature="100" frictionloss="100"/>
+                                <inertial pos="0.0018 0 0.01634" mass="0.013" diaginertia="0.1 0.1 0.1"/>
+                                <geom name="link5_connector" type="mesh" mesh="link5_connector" pos="0 0 0"
+                                      material="black"
+                                      conaffinity="32" contype="32"/>
+                                <geom name="link5" type="mesh" mesh="link5" pos="0 0 0.0079" material="grey"
+                                      conaffinity="32" contype="32"/>
+                                <geom name="link5_cap" type="mesh" mesh="link5_cap" pos="0.025 0 0.053" material="blue"
+                                      conaffinity="32" contype="32"/>
+
+                                <!--                             euler="-.009 0 0"-->
+                                <body name="link6" pos="-0.04165 0 0.05305">
+                                    <joint name="joint5" axis="-1 0 0" pos="0 0 0" limited="true"
+                                           range="-6.28319 6.28319" armature="100" frictionloss="100"/>
+                                    <inertial pos="-0.038841 0 0" mass="0.0365" diaginertia="0.1 0.1 0.1"/>
+                                    <geom name="link6_connector" type="mesh" mesh="link6_connector" pos="0 0 0"
+                                          material="black" conaffinity="32" contype="32"/>
+                                    <geom name="link6" type="mesh" mesh="link6" pos="-0.008 0 0" material="grey"
+                                          conaffinity="32" contype="32"/>
+
+                                    <body name="ee_link"/>
+                                </body>
+                            </body>
+                        </body>
+                    </body>
+                </body>
+            </body>
+        </body>
+    </worldbody>
+    <actuator>
+        <!-- Arm Joints-->
+        <motor gear="100" name="arm_joint0_motor" joint="joint0" ctrllimited="true" ctrlrange="-3 3"
+               forcelimited="true" forcerange="-10 10"/>
+        <motor gear="100" name="arm_joint1_motor" joint="joint1" ctrllimited="true" ctrlrange="-10 10"
+               forcelimited="true" forcerange="-10 10"/>
+        <motor gear="100" name="arm_joint2_motor" joint="joint2" ctrllimited="true" ctrlrange="-10 10"
+               forcelimited="true" forcerange="-10 10"/>
+        <motor gear="100" name="arm_joint3_motor" joint="joint3" ctrllimited="true" ctrlrange="-10 10"
+               forcelimited="true" forcerange="-10 10"/>
+        <motor gear="100" name="arm_joint4_motor" joint="joint4" ctrllimited="true" ctrlrange="-10 10"
+               forcelimited="true" forcerange="-10 10"/>
+        <motor gear="100" name="arm_joint5_motor" joint="joint5" ctrllimited="true" ctrlrange="-10 10"
+               forcelimited="true" forcerange="-10 10"/>
+    </actuator>
+    <sensor>
+        <actuatorpos name="arm_joint0_sensor" actuator="arm_joint0_motor"/>
+        <actuatorpos name="arm_joint1_sensor" actuator="arm_joint1_motor"/>
+        <actuatorpos name="arm_joint2_sensor" actuator="arm_joint2_motor"/>
+        <actuatorpos name="arm_joint3_sensor" actuator="arm_joint3_motor"/>
+        <actuatorpos name="arm_joint4_sensor" actuator="arm_joint4_motor"/>
+        <actuatorpos name="arm_joint5_sensor" actuator="arm_joint5_motor"/>
+    </sensor>
+</mujoco>

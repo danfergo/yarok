@@ -1,0 +1,57 @@
+<!--
+    First Gelsight model to be attached to the Robot Arm
+-->
+<mujoco>
+    <asset>
+        <material name="black_resin" rgba="0.1 0.1 0.1 1"/>
+        <material name="gray_elastomer" rgba="0.8 0.8 0.8 1"/>
+        <material name="transparent_glass" rgba="0.9 0.95 1 0.7"/>
+
+        <!-- gelsight models-->
+        <mesh name="gelsight_front" file="meshes/gelsight2014_front.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="gelsight_back" file="meshes/gelsight2014_back.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="gelsight_glass" file="meshes/glass.stl" scale="0.0009 0.00125 0.001"/>
+
+        <mesh name="front_cover" file="meshes/mountable_gelsight.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="back_cover" file="meshes/back_cover.stl" scale="0.001 0.001 0.001"/>
+
+    </asset>
+    <worldbody>
+        <body name="sensor_body" pos="0 0 0">
+            <!--Front and Back-->
+            <geom name="front" type="mesh" material="black_resin" mesh="front_cover" mass="0.05" contype="32"
+                  conaffinity="32" friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+            <geom name="back" type="mesh" material="black_resin" mesh="back_cover" mass="0.05" contype="32"
+                  conaffinity="32" friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+
+            <!--Glass Cover-->
+            <geom name="glass0" type="mesh" material="transparent_glass" mesh="gelsight_glass" mass="0.005"
+                  contype="32" conaffinity="32" pos="-0.011 0 0.029"/>
+            <geom name="glass1" type="mesh" material="transparent_glass" mesh="gelsight_glass" mass="0.005"
+                  contype="32" conaffinity="32" pos="0.0115 0 0.029" quat="0 0 0 1"/>
+
+            <!--Elastomer-->
+            <geom name="elastomer" type="box" size="0.013 0.013 0.001" euler="0 0 0" pos="0 0 0.033"
+                  contype="0"
+                  conaffinity="32" rgba="0.9 0.95 1 0.1"/>
+
+            <!--Elastomer Cover-->
+            <geom name="elast_cover" type="box" size="0.013 0.013 0.00001" euler="0 0 0" pos="0 0 0.034001"
+                  contype="0" conaffinity="32" material="black_resin"
+                  friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+
+            <!--Gel Camera-->
+            <camera name="camera" mode="fixed" pos="0 0 0" euler="0 3.14159 -1.5708" fovy="20"/>
+
+            <!-- Friction placholder -->
+            <geom name="friction" type="box"
+                  size="0.013 0.013 0.00001"
+                  euler="0 0 0"
+                  pos="0 0 0.032"
+                  contype="32"
+                  conaffinity="32" rgba="0 0 0 0"
+                  friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+
+        </body>
+    </worldbody>
+</mujoco>
