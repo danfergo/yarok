@@ -46,6 +46,9 @@ class ComponentsManager:
         #     self.init_interfaces(self.root_component, self.model, sim)
         #     self.init_components(root_component)
 
+    def get(self, n):
+        return self.components[n]
+
     def data(self, n):
         return self.components[n]['factory'].__data__
 
