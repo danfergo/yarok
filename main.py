@@ -1,15 +1,20 @@
 import sys
 
-from src.env import yarok
-from yarok.worlds.empty_world.empty_world import EmptyWorld
+import yarok.__main__
+
+
+# from src.env import yarok
+# from yarok.worlds.empty_world.empty_world import EmptyWorld
 
 
 def main():
-    yarok.run(EmptyWorld, {
-        'platform_args': {
-            'viewer_mode': sys.argv[1]
-        }
-    })
+    yarok.__main__.main()
+
+    # yarok.run(EmptyWorld, {
+    #     'platform_args': {
+    #         'viewer_mode': sys.argv[1]
+    #     }
+    # })
 
     # environment = SimEnvironment(
     #     mode='view',
@@ -34,6 +39,7 @@ def main():
 
     # environment.sim.data.ctrl[0] = pid.output
     # pass
+
 
 if __name__ == '__main__':
     main()

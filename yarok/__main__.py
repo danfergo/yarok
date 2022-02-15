@@ -14,6 +14,7 @@ def load(path, name):
     :param name:
     :return: loaded class.
     """
+    print('---------_> ', __package__)
     return getattr(importlib.import_module(path, __package__), name)
 
 def main():
@@ -46,14 +47,14 @@ def main():
     # Logger.header()
 
     if not args.version:
-        args_dict = vars(args)
-        args_dict.pop('verbose')
-        args_dict.pop('version')
-        args_dict.pop('debug')
+        # args_dict = vars(args)
+        # args_dict.pop('verbose')
+        # args_dict.pop('version')
+        # args_dict.pop('debug')
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
-        run(load('worlds/empty_world/empty_world', 'EmptyWorld'), {
+        run(load('.worlds.empty_world.empty_world', 'EmptyWorld'), {
             'platform_args': {
                 'viewer_mode': 'view'
             }

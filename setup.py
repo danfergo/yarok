@@ -24,7 +24,6 @@ setup(
     # scripts=['bin/lidaco'],
     author_email='danfergo@gmail.com',
     url='https://github.com/danfergo/yarok',  # use the URL to the github repo
-    # download_url='https://github.com/e-WindLidar/Lidaco/archive/v0.0.1.tar.gz',
     keywords=['yarok', 'robot', 'framework', 'mujoco'],  # arbitrary keywords
     classifiers=[],
     install_requires=[

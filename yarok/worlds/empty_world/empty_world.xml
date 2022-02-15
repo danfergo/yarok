@@ -17,7 +17,7 @@
 
     <asset>
         <texture name="floor_tile"
-                 file="/home/danfergo/Projects/PhD/mj_geltip_sim/src/env/worlds/empty_world/textures/floor_tile.png"
+                 file="textures/floor_tile.png"
                  width="3000" height="3000" type="2d"/>
 
         <material name="tile" texture="floor_tile" specular="0" shininess="0" reflectance="0" emission="1"/>
@@ -27,7 +27,7 @@
 
         <texture name="texmarble"
                  type="cube"
-                 file="/home/danfergo/Projects/PhD/mj_geltip_sim/src/env/worlds/empty_world/textures/marble.png"/>
+                 file="textures/marble.png"/>
 
         <material name="matplane" reflectance="0.3" texture="texplane" texrepeat="1 1" texuniform="true"/>
         <material name="matmarble" texture="texmarble" rgba=".7 .7 .7 1"/>
