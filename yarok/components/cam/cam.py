@@ -1,5 +1,5 @@
-from src.env.yarok.components_manager import component
-from src.env.yarok.mjc.interface import InterfaceMJC
+from yarok.components_manager import component
+from yarok.mjc.interface import InterfaceMJC
 
 
 class CameraInterfaceMJC:

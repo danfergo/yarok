@@ -1,7 +1,7 @@
 import sys
 
 from src.env import yarok
-from src.env.worlds.empty_world.empty_world import EmptyWorld
+from yarok.worlds.empty_world.empty_world import EmptyWorld
 
 
 def main():

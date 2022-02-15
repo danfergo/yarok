@@ -1,4 +1,4 @@
-from src.env.yarok.components_manager import component
+from yarok.components_manager import component
 
 
 @component()

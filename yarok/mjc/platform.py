@@ -2,9 +2,9 @@ from xml.etree.ElementTree import tostring
 
 from mujoco_py import MjSim, load_model_from_xml
 
-from src.env.yarok import ComponentsManager
-from src.env.yarok.mjc.interface import InterfaceMJC
-from src.env.yarok.mjc.viewer import ViewerMJC
+from ..components_manager import ComponentsManager
+from ..mjc.interface import InterfaceMJC
+from ..mjc.viewer import ViewerMJC
 
 
 class PlatformMJC:

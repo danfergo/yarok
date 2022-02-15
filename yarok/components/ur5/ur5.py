@@ -1,8 +1,7 @@
 from math import pi
 
-from src.env.utils.PID import PID
-
-from src.env.yarok.components_manager import component
+from yarok.utils.PID import PID
+from yarok.components_manager import component
 
 
 class UR5InterfaceMJC:
