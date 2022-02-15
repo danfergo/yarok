@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(),
-    version='0.0.2',
+    version='0.0.3',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
