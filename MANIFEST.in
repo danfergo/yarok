@@ -1,0 +1,5 @@
+include worlds/*.xml
+include components/*.xml
+
+include components/*.stl
+include components/*.png
