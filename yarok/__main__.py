@@ -36,7 +36,7 @@ def load(p):
         sys.modules[module_name] = module
         spec.loader.exec_module(module)
     except FileNotFoundError:
-        module = importlib.import_module('.components.' + path, __package__)
+        module = importlib.import_module('.components.' + p, __package__)
     return getattr(module, to_camel_case(module_name))
 
 
