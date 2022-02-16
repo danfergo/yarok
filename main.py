@@ -2,13 +2,23 @@ import sys
 
 import yarok.__main__
 
+import importlib
 
 # from src.env import yarok
 # from yarok.worlds.empty_world.empty_world import EmptyWorld
 
 
 def main():
-    yarok.__main__.main()
+
+    print('---------_> ', __package__)
+    # __package__
+    # print('------> ', path, __file__, os.path.dirname(__file__))
+    # print('---------_> ', importlib.import_module(os.path.dirname(__file__)))
+    # print('====>> ')
+    print(importlib.import_module('yarok.__main__'))
+
+
+    # yarok.__main__.main()
 
     # yarok.run(EmptyWorld, {
     #     'platform_args': {

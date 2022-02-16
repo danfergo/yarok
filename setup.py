@@ -13,7 +13,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
-    version='0.0.6',
+    version='0.0.7',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
@@ -27,6 +27,6 @@ setup(
     keywords=['yarok', 'robot', 'framework', 'mujoco'],  # arbitrary keywords
     classifiers=[],
     install_requires=[
-        # 'pyyaml',
+        'mujoco_py',
     ]
 )

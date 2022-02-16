@@ -1,21 +1,45 @@
 import importlib
 import os
 from os import path
+import os
 import argparse
 
 from .__init__ import run
 
+import importlib.util
+import sys
+from enum import Enum
 
-def load(path, name):
+
+# adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
+def to_camel_case(snake_str):
+    components = snake_str.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return ''.join(x.title() for x in components)
+
+
+def load(p):
     """
     Dynamically loads a module with name "name" and retrieves
     the class with the same name declared in that file.
-    :param path:
-    :param name:
+    :param p:
+    :param class_name:
     :return: loaded class.
     """
-    print('---------_> ', __package__)
-    return getattr(importlib.import_module(path, __package__), name)
+
+    module_name = p[p.rfind('.') + 1:]
+
+    try:
+        spec = importlib.util.spec_from_file_location(module_name, os.getcwd() + '/' + p.replace('.', '/') + ".py")
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+    except FileNotFoundError:
+        module = importlib.import_module(path, __package__)
+    # print('>> ', p.rfind('.'), p, module_name, to_camel_case(module_name))
+    return getattr(module, to_camel_case(module_name))
+
 
 def main():
     """
@@ -23,6 +47,8 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('command', choices=['run'])
+    parser.add_argument('component', type=str)
 
     # parser.add_argument('-C', '--config-file', default='config.yaml',
     #                     help='Configuration file path (default: configs.xml)')
@@ -47,14 +73,16 @@ def main():
     # Logger.header()
 
     if not args.version:
+        # opts = parser.parse_args()
         # args_dict = vars(args)
         # args_dict.pop('verbose')
         # args_dict.pop('version')
         # args_dict.pop('debug')
 
-        dir_path = os.path.dirname(os.path.realpath(__file__))
+        # print('XXXXXXXXXXXXXXXXXXXx', args.command)
+        # dir_path = os.path.dirname(os.path.realpath(__file__))
 
-        run(load('.worlds.empty_world.empty_world', 'EmptyWorld'), {
+        run(load(args.component), {
             'platform_args': {
                 'viewer_mode': 'view'
             }
@@ -62,6 +90,7 @@ def main():
 
         # builder = Builder(**args_dict)
         # builder.build()
+
     else:
         print('version 0.0.1')
         # Logger.log('about')

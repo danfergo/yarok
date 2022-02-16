@@ -1,5 +1,3 @@
-include worlds/*.xml
-include components/*.xml
-
-include components/*.stl
-include components/*.png
+global-include **/*.xml
+global-include **/*.stl
+global-include **/*.png
