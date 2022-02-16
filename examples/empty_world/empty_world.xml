@@ -49,15 +49,15 @@
         </body>
 
         <!-- UR5 Arm & Gripper -->
-<!--        <body pos="0 0 .615">-->
-<!--            <ur5 name="mani">-->
-<!--                <robotiq_2f85 name="gripper1" parent="ee_link">-->
-<!--                    <geltip name="geltip1" parent="gelsight_0"/>-->
-<!--&lt;!&ndash;                    <gelsight2014 name="gelsight1" parent="gelsight_0"/>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <gelsight2014 name="gelsight2" parent="gelsight_1"/>&ndash;&gt;-->
-<!--                </robotiq_2f85>-->
-<!--            </ur5>-->
-<!--        </body>-->
+        <body pos="0 0 .615">
+            <ur5 name="mani">
+                <robotiq_2f85 name="gripper1" parent="ee_link">
+                    <geltip name="geltip1" parent="gelsight_0"/>
+<!--                    <gelsight2014 name="gelsight1" parent="gelsight_0"/>-->
+<!--                    <gelsight2014 name="gelsight2" parent="gelsight_1"/>-->
+                </robotiq_2f85>
+            </ur5>
+        </body>
 
 <!--        <body pos="1 0 .615">-->
 <!--            <ur5 name="mani">-->
