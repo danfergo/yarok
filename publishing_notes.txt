@@ -3,7 +3,7 @@ rm -rf build && rm -rf dist
 git add *
 git commit -m "saving changes in preparation for version 0.0.X"
 
-bumpversion --current-version 0.0.X patch setup.py
+bumpversion --current-version 0.0.(X-1) patch setup.py
 
 git add *
 git commit -m "updating version to 0.0.X"
