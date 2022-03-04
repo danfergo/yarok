@@ -5,7 +5,7 @@ from yarok.components_manager import component
 
 from yarok.components.robotiq_2f85.robotiq_2f85 import robotiq_2f85
 from yarok.components.ur5.ur5 import UR5
-from yarok.components.gelsight2014.gelsight2014 import gelsight2014
+from yarok.components.gelsight.gelsight2014 import gelsight2014
 from yarok.components.geltip.geltip import geltip
 
 
@@ -20,6 +20,7 @@ class EmptyWorldInterfaceMJC:
         # cv2.waitKey(1)
         pass
 
+
 @component(
     components=[
         UR5,
@@ -29,7 +30,7 @@ class EmptyWorldInterfaceMJC:
         AnetA30,
         Cam
     ],
-    interface_mjc=EmptyWorldInterfaceMJC
+    interface_mjc=EmptyWorldInterfaceMJC,
 )
 class EmptyWorld:
 

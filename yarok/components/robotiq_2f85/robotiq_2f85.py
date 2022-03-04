@@ -18,9 +18,17 @@ class robotiq_2f85:
     def __init__(self):
         pass
 
+    def is_open(self):
+        pass
+
+    def is_closed(self):
+        pass
+
     def move(self, a):
         pass
 
-    # def move(self, ):
+    def open(self):
+        self.move(1)
+
     def close(self):
         self.move(0)

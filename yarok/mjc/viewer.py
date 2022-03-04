@@ -3,35 +3,31 @@ from mujoco_py import MjViewerBasic, MjViewer
 
 
 class ViewerMJC:
+    """
+        The MuJoCo viewer wrapper.
+
+        The step method can be called to update the viewer.
+        i.e.,
+            in the case of VIEW mode
+                - is calls mjViewer.render() - the default MuJoCo renderer
+            in case of RUN mode
+                - it grabs a frame from the default camera and displays
+    """
 
     def __init__(self, sim, mode):
         self.sim = sim
-        self.mode = mode
+        self.mode = ('' + mode).lower()
         self.frame_counter = 0
-        print('MODE!!!', mode)
+
         if self.mode == 'view':
             self.mjViewer = MjViewer(self.sim)
-        # if self.mode == 'run':
-        # self.sim.step()
-        # self.frame_counter += 1
-        # if self.frame_counter >= 30:
-        # g_rgb = cv2.flip(g_rgb, 1)  # 1, horizontal flip
-        # c_rgb = cv2.flip(c_rgb, 1)  # 1, horizontal flip
-        #
-        # g_rgb = cv2.cvtColor(g_rgb, cv2.COLOR_RGB2BGR)
-        # c_rgb = cv2.cvtColor(c_rgb, cv2.COLOR_RGB2BGR)
-        #
-        # cv2.imshow('geltip', g_rgb)
-        # cv2.imshow('global', c_rgb)
-
-        # else:
 
     def step(self):
         if self.mode == 'run':
-                                    # camera_name='global',
             c_rgb = self.sim.render(width=1000,
                                     height=1000,
                                     depth=False,
+                                    camera_name=':extrinsic_cam',
                                     mode='offscreen')
             c_bgr = cv2.cvtColor(c_rgb, cv2.COLOR_RGB2BGR)
             g_bgr_flip = cv2.flip(c_bgr, 0)

@@ -8,51 +8,97 @@ from xml.etree.ElementTree import tostring
 
 from mujoco_py import load_model_from_xml, MjSim
 
+# attributes that are renamed from 'name' to 'id'
+RENAME_KEYS_ATTRS_NAMES = [
+    'name',
+    'joint',
+    'actuator',
+    'body1',
+    'body2',
+    'material',
+    'mesh',
+    'texture'
+]
+
+# names of the blocks to be merged
+# except worldbody that follows a special merging process
+# i.e. nesting components, etc.
+EXTENDABLE_BLOCKS_NAMES = [
+    'asset',
+    'sensor',
+    'actuator',
+    'equality'
+]
+
 
 class ComponentsManager:
     """
-        Handles loading components templates (.xml) & controllers (.py),
-        Builds world model/components tree
+    Handles loading components templates (.xml) & controllers (.py)
+    and Builds xml tree and components i.e.,
+
+    - self.xml_tree   =>
+    - self.components => dict ([component.id] => dict(
+        class => component factory class,
+        name => component name,
+        class_name => component factory (snake-case) name,
+        id => auto generated id,
+        children => [dict(...)],
+        instance => object ref             # set while instantiating the components
+    ))
+
+
     """
 
     def __init__(self, **kwargs):
         self.id_counter = 0
-        root_component_factory = kwargs['root']
-        root_component_factories = root_component_factory.__data__['components']
-
-        self.root = {
-            'factory': root_component_factory,
-            'name': '',
-            'id': self.gen_name(),
-            'children': []
-        }
-
-        self.xml_tree = self.load_tree(self.root, components_factories=root_component_factories)
-
         self.components = {}
 
-        # build components map and init interfaces
+        root = {
+            'class': kwargs['root'],
+            'name': '',
+            'id': self.gen_id(),
+            'parent': None,
+            'children': []
+        }
+        self.xml_tree = self.load_tree(root)
+
+        # build components map
         def walk_components(component):
             for child in component['children']:
                 walk_components(child)
-
             self.components[component['id']] = component
 
-        walk_components(self.root)
+        walk_components(root)
 
-        # root['instance'].init()
+    def is_id(self, idx):
+        return isinstance(idx, int) or isinstance(idx, str)
 
-        # def init(self, sim):
-        #     self.init_interfaces(self.root_component, self.model, sim)
-        #     self.init_components(root_component)
+    def gen_id(self, name=''):
+        self.id_counter += 1
+        # '__c__' + str(self.id_counter) + '-' +
+        return name
 
     def get(self, n):
         return self.components[n]
 
-    def data(self, n):
-        return self.components[n]['factory'].__data__
+    def get_by_name(self, c, name):
+        """
+            Gets a component by 'name', given its parent 'c' (or its parent id)
+        """
+        comp = self.components[c] if self.is_id(c) else c
 
-    # def step(self):
+        for child in comp['children']:
+            if name == 'name':
+                return child
+        return None
+
+    def data(self, c):
+        comp = self.components[c] if self.is_id(c) else c
+        return comp['class'].__data__
+
+    def step(self):
+        print('-->')
+
     # def step_components(component):
     #     for child in component['children']:
     #         step_components(child)
@@ -66,75 +112,96 @@ class ComponentsManager:
     # if self.viewer is not None:
     #     self.viewer.step()
 
-    def load_tree(self, comp, sub_trees=None, components_factories=None):
-        sub_trees = [] if sub_trees is None else sub_trees
-        xml_path = comp['factory'].__data__['template_path']
-        name = comp['name']
+    def load_tree(self, comp, sub_tree=None):
+        """
+            The method that loads the multiple components and its template (.xml) into
+            a single xml/model tree. It also loads the multiple components into a tree
+        """
+
+        # inits auxiliar variables from the component metadata
+        template = comp['class'].__data__['template']
+        xml_path = comp['class'].__data__['template_path']
+        component_components_factories = comp['class'].__data__['components']
         id = comp['id']
 
-        tree = ET.parse(xml_path).getroot()
+        def is_component(el):
+            # if el in __components_factories__:
+            #     return el.tag
+            # print(el in components_factories)
+            return el.tag in component_components_factories
 
+        # loads xml tree from xml path
+        tree = ET.fromstring(template) if template is not None else ET.parse(xml_path).getroot()
+
+        # re-pathing all file refs, that are not absolute refs, to be relative to the .xml file
+        dir_path = str(pathlib.Path(xml_path).parent.resolve())
+        for e in tree.iter():
+            if 'file' in e.attrib and not e.attrib['file'].startswith('/'):
+                e.attrib['file'] = dir_path + '/' + e.attrib['file']
+
+        # nests all descendant elements specified in the parent xml,
+        # e.g. in the environment.xml <parent><child_to_nest parent='link_name'></child_to_nest></parent>
+        # in this case, the child_to_nest is nested as the last child of the the element @name='link_name'
+        # in the current .xml template.
         wb = tree.find('worldbody')
+        if sub_tree is not None:
+            for sub_tree in list(sub_tree['tree']):
+                if 'parent' in sub_tree.attrib:
+                    parentName = sub_tree.attrib['parent']
+                    parent = wb.find(".//body[@name='" + parentName + "']")
+                    if parent is None:
+                        raise KeyError('Failed to inject ' +
+                                       tostring(sub_tree, encoding="unicode").replace('\n', '').strip() +
+                                       ' body[name=' +
+                                       parentName +
+                                       '] not being found at ' + xml_path)
+                    # sub_tree.attrib['__base_component__'] = sub_tree['base_component']
+                    sub_tree.attrib.pop('parent')
+                    parent.append(sub_tree)
+                else:
+                    wb.append(sub_tree)
 
-        # nesting all descendant content
-        for sub_tree in sub_trees:
-            if 'parent' in sub_tree.attrib:
-                parentName = sub_tree.attrib['parent']
-                parent = wb.find(".//body[@name='" + parentName + "']")
-                if parent is None:
-                    raise KeyError('Failed to inject ' +
-                                   tostring(sub_tree, encoding="unicode").replace('\n', '').strip() +
-                                   ' body[name=' +
-                                   parentName +
-                                   '] not being found at ' + xml_path)
-                sub_tree.attrib.pop('parent')
-                parent.append(sub_tree)
-            else:
-                wb.append(sub_tree)
-
-        # renaming "foreign keys" to from xxx to id:xxx
-        rename_attrs = ['name', 'joint', 'actuator', 'body1', 'body2', 'material', 'mesh', 'texture']
-
+        # renaming primary&foreign keys to from xxx to id:xxx
         def rename_fk(els):
             for el in els:
-                if el.tag not in components_factories:
-                    for attr in rename_attrs:
+                if not is_component(el):
+                    for attr in RENAME_KEYS_ATTRS_NAMES:
                         if attr in el.attrib:
                             el.attrib[attr] = id + ':' + el.attrib[attr]
                     rename_fk(list(el))
 
         rename_fk(list(tree))
 
-        # repathing all local file refs to be relative to the .xml file
-        dir_path = str(pathlib.Path(xml_path).parent.resolve())
-        for el in tree.iter():
-            if 'file' in el.attrib and not el.attrib['file'].startswith('/'):
-                el.attrib['file'] = dir_path + '/' + el.attrib['file']
+        extendable_blocks = {block_name: tree.find(block_name) for block_name in EXTENDABLE_BLOCKS_NAMES}
 
-        blocks_names = ['asset', 'sensor', 'actuator', 'equality']
-        blocks = {block_name: tree.find(block_name) for block_name in blocks_names}
-
-        parent_map = {c: p for p in tree.iter() for c in p if c.tag in components_factories}
-
-        rename_attrs = ['name', 'joint', 'actuator', 'body1', 'body2', 'material', 'mesh']
+        # auxiliary map that maps child->parent element,
+        # for component instantiation elements
+        parent_map = {child_: parent_ for parent_ in tree.iter()
+                      for child_ in parent_ if is_component(child_)}
 
         # walking current file .xml tree and looking for components and instantiating them
-        def walk_tree(component_trees):
-            for component_tree in component_trees:
-                tag = component_tree.tag
-                if tag in components_factories:
+        def walk_tree(element_tree):
+            for element in list(element_tree):
+                tag = element.tag
+                if is_component(element):
 
-                    component_type = tag  # component.attrib['type']
-                    component_name = component_tree.attrib['name']
+                    component_class_name = tag
+                    component_name = element.attrib['name']
+
                     if component_name == '':
                         raise KeyError(
-                            'No component should be named ""!, ' + component_type + '[name=root] at' + comp['name'])
+                            'No component should be named ""!, ' +
+                            component_class_name +
+                            '[name=root] at' +
+                            comp['name'])
 
                     # creates new sub component data wrapper
                     sub_component = {
-                        'id': self.gen_name(component_name),
+                        'id': self.gen_id(component_name),
                         'name': component_name,
-                        'factory': components_factories[component_type],
+                        'class_name': component_class_name,
+                        'class': component_components_factories[component_class_name],
+                        'parent': comp,
                         'children': []
                     }
 
@@ -144,71 +211,68 @@ class ComponentsManager:
                     # load the new subcomponent tree
                     sub_component_tree = self.load_tree(
                         sub_component,
-                        sub_trees=list(component_tree),
-                        components_factories=components_factories
+                        sub_tree={'tree': element, 'base_component': comp}
                     )
 
-                    # merge all blocks actuators, sensors, etc to with the current component tree
-                    for block_name in blocks_names:
+                    # if hasattr(component_tree,  '__components_factories__'):
+                    #     print(getattr(component_tree, '__components_factories__'))
+
+                    # merge all blocks actuators, sensors, etc
+                    # with the current component tree
+                    for block_name in extendable_blocks:
                         block = sub_component_tree.find(block_name)
                         if block is not None:
-                            if blocks[block_name] is not None:
-                                blocks[block_name].extend(block)
+                            if extendable_blocks[block_name] is not None:
+                                extendable_blocks[block_name].extend(block)
                             else:
                                 tree.append(block)
 
                     # merge the new subcomponent tree/body with the current tree
                     # and remove the "component" tag from the current tree
                     comp_wb = sub_component_tree.find('worldbody')
-                    parent_map[component_tree].extend(comp_wb)
-                    parent_map[component_tree].remove(component_tree)
+                    parent_map[element].extend(comp_wb)
+                    parent_map[element].remove(element)
 
                 else:
-                    walk_tree(list(component_tree))
+                    walk_tree(element)
 
-        walk_tree(list(tree))
+        walk_tree(tree)
 
         return tree
 
-    def gen_name(self, name=''):
-        self.id_counter += 1
-        return '__c__' + str(self.id_counter) + '-' + name
-
     def init_components(self, interfaces):
+        """
+            Initializes components.
+            Called after all the interfaces are instantiated (by the platform manager)
 
-        # sub_components = []
-        # for child in comp['children']:
-        #     sub_components.extend(self.init_components(child))
+            Iterates through all components,
+                - Gets the component class annotations,
+                instantiates the component and stores at component['instance']
 
-        for n, comp in self.components.items():
+                - Gets and stores the component interface
+        """
 
-            # sub_components = list(chain.from_iterable(sub_components))
-            # sub_components_map = {t[0]: t[1] for t in sub_components}
-            c_data = comp['factory'].__data__
-            print(comp['name'], c_data['annotations'], self.components.keys())
-            kwargs = {n: self.components[n] for n in c_data['annotations']}
+        for component_id, comp in self.components.items():
+
+            c_data = comp['class'].__data__
 
             try:
-                c = comp['factory'](**kwargs)
+                c = comp['class'](**{n: self.get_by_name(comp, n) for n in c_data['annotations']})
                 comp['instance'] = c
 
-                if n in interfaces:
-                    # interface_factory = c_data['interfaces'][self.env]
-                    # interface = interface_factory(comp['interface_instance_mjc'])
-                    c_data['interface_instance'] = interfaces[n]
+                if component_id in interfaces:
+                    interface = c_data['interface_instance'] = interfaces[component_id]
 
-                    methods = [i for i in dir(interfaces[n].__class__) if i[0:2] != '__']
-                    # print(methods, getattr(interface, 'on'))
-                    [setattr(c, m, getattr(interfaces[n], m)) for m in methods if hasattr(c, m)]
-                    # print(methods)
-                    # print()
+                    methods = [i for i in dir(interface.__class__) if i[0:2] != '__']
+                    [setattr(c, m, getattr(interface, m)) for m in methods if hasattr(c, m)]
 
-                # sub_components.append((comp['factory'], c))
             except TypeError as e:
-                raise TypeError(str(e) + ', while initiating ' + str(comp['factory']) + (
+                raise TypeError(str(e) + ', while initiating ' + str(comp['class']) + (
                     '/' + comp['name'] if comp['name'] is not None else ''))
 
-        # return sub_components
+    # interface_factory = c_data['interfaces'][self.env]
+    # interface = interface_factory(comp['interface_instance_mjc'])
+    # return sub_components
 
     # def init_interfaces(self, root_component, sim, model):
     #
@@ -266,26 +330,35 @@ def component(**kwargs):
 
             interfaces = {k[10:]: kwargs[k] for k in kwargs if k.startswith('interface_')}
 
-            # components = kwargs['components'] if 'components' in kwargs else []
             components = kwargs['components'] if 'components' in kwargs else []
-            components = {c.__data__['name']: c for c in components}
+            components = {c.__data__['class_name']: c for c in components}
+            probe = kwargs['probe'] if 'probe' in kwargs else None
+            template = kwargs['template'] if 'template' in kwargs else None
 
             setattr(c, '__data__', {
-                'name': class_name,
-                'class_file_path': class_file_path,
-                'class_dir_path': class_dir_path,
-                'template_path': class_dir_path + '/' + class_name + '.xml',
+                'class_name': class_name,  # the name of the factory class, in snake case
+                'class_file_path': class_file_path,  # the abs path of the FILE where the class is declared
+                'class_dir_path': class_dir_path,  # the abs path of the DIRECTORY where the class is declared
+                'template': template,
+                'template_path': class_dir_path + '/' + class_name + '.xml',  # the abs path of the .xml template
+
+                # the dict of components' classes indexed by class name
+                # e.g.:  {'ur5': <class 'yarok.components.ur5.ur5.UR5'>, ...}
                 'components': components,
+
+                # the class constructor annotations
+                # format: dict({ comp. name : class }) e.g.
+                # e.g.:  {'mani': <class 'yarok.components.ur5.ur5.UR5'>, ...}
                 'annotations': init_annotations,
-                'interfaces': interfaces
+
+                # interfaces's classes indexed environment "name"
+                # e.g.: {'mjc': <class 'yarok.components.ur5.ur5.UR5InterfaceMJC'>}
+                'interfaces': interfaces,
+
+                # probe. a fn that returns an object key:value
+                # the value is plotted or logged depending on the type.
+                'probe': probe
             })
         return c
-
-    return _
-
-
-def on(**kwargs):
-    def _(m):
-        return m
 
     return _

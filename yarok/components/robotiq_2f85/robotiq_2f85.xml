@@ -66,7 +66,7 @@
 
                             <!-- Gelsight Sensor -->
                             <body name="gelsight_0" pos="-0.0765 0.1612 0.0942" euler="0 1.5708 -1.5708">
-                                <!--                            <include file="textures/gelsight2014.xml"/>-->
+                                <!--                            <include file="textures/gelsight.xml"/>-->
                             </body>
                         </body>
                     </body>

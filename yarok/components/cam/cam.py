@@ -7,8 +7,8 @@ class CameraInterfaceMJC:
     def __init__(self, interface: InterfaceMJC):
         self.interface = interface
 
-    def get_frame(self):
-        return self.interface.get_frame('cam')
+    def read(self, depth=False, shape=(480, 640)):
+        return self.interface.read_camera('cam', depth, shape)
 
 
 @component(
@@ -17,4 +17,8 @@ class CameraInterfaceMJC:
 class Cam:
 
     def __init__(self):
+        pass
+
+    def read(self, depth=False, shape=(480, 640)):
+        # Implemented by the interface
         pass

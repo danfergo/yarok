@@ -10,7 +10,6 @@ import importlib.util
 import sys
 from enum import Enum
 
-
 # adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
 def to_camel_case(snake_str):
     components = snake_str.split('_')
@@ -42,7 +41,12 @@ def load(p):
 
 def main():
     """
-        Converter command entry point.
+        yarok cli entry point.
+        Parses the cli arguments and calls the corresponding python methods/apis, e.g.,
+
+        yarok run Environment Behaviour Arguments
+            ->  yarok.run(Environmnet,Behaviour, **Arguments)
+
     """
 
     parser = argparse.ArgumentParser()

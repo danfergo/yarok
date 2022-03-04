@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export PYTHONPATH=$PYTHONPATH:~/Projects/PhD/mj_geltip_sim
+
+if [[ "$2" = "view" ]]
+then
+  export LD_PRELOAD='/usr/lib/x86_64-linux-gnu/libGLEW.so'
+  export MJ_ENV='view'
+else
+	unset LD_PRELOAD
+	export MJ_ENV='run'
+fi
+python3 -m $@
