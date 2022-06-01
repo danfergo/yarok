@@ -119,7 +119,9 @@
                                     <geom name="link6" type="mesh" mesh="link6" pos="-0.008 0 0" material="grey"
                                           conaffinity="32" contype="32"/>
 
-                                    <body name="ee_link"/>
+                                    <body pos="-0.041 0 0" zaxis="-1 0 0">
+                                        <body name="ee_link"/>
+                                    </body>
                                 </body>
                             </body>
                         </body>

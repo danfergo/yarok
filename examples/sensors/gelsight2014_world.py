@@ -1,6 +1,8 @@
 from yarok.components_manager import component
 from yarok.components.gelsight.gelsight2014 import gelsight2014
 
+from yarok.mjc.platform import PlatformMJC
+from yarok.hw.platform import PlatformHW
 
 @component(
     # probe=lambda c: {'gelsight', c.gelsight.read()},
@@ -26,7 +28,7 @@ from yarok.components.gelsight.gelsight2014 import gelsight2014
     
         <worldbody>
             <!-- empty environment geometries, lights, default camera (for the viewer) -->
-            <camera name="extrinsic_cam" pos="0 0 0.5" mode="fixed" zaxis="0 0 1"/>
+            <camera name="viewer" pos="0 0 0.5" mode="fixed" zaxis="0 0 1"/>
             <light directional="true" diffuse=".4 .4 .4" specular="0.1 0.1 0.1" pos="0 0 5.0" dir="0 0 -1"/>
             <light directional="true" diffuse=".6 .6 .6" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1"/>
             <body name="floor">
@@ -64,8 +66,34 @@ if __name__ == '__main__':
     #               }
     #           })
 
-    yarok.run(Gelsight2014World, None, {
-        'platform_args': {
-            'viewer_mode': sys.argv[1]
+    yarok.run({
+        'world': Gelsight2014World,
+        'defaults': {
+            'environment': 'sim',
+            'behaviour': {
+            },
+            'components': {
+                '/': {
+                    'object': 'cone'
+                }
+            }
+        },
+        'environments': {
+            'sim': {
+                'platform': {
+                    'class': PlatformMJC,
+                    'mode': 'view'
+                },
+                'inspector': True,
+                'behaviour': {
+                    'dataset_name': 'sim_depth'
+                }
+            },
+            'real': {
+                'platform': PlatformHW,
+                'behaviour': {
+                    'dataset_name': 'real_rgb'
+                },
+            }
         }
     })

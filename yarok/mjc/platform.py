@@ -1,10 +1,11 @@
 from xml.etree.ElementTree import tostring
 
-from mujoco_py import MjSim, load_model_from_xml
+from mujoco_py import MjSim, load_model_from_xml, MjRenderContextOffscreen
 
 from ..components_manager import ComponentsManager
 from ..mjc.interface import InterfaceMJC
 from ..mjc.viewer import ViewerMJC
+from ..config import ConfigBlock
 
 INTERFACES_COMPONENTS_NAMES = [
     'sensor',
@@ -27,22 +28,37 @@ class PlatformMJC:
         Exposes the step() method that steps() through all the interfaces.
     """
 
-    def __init__(self, manager: ComponentsManager, viewer_mode='view'):
+    def __init__(self, manager: ComponentsManager, config: ConfigBlock):
+        self.config = config['platform'] if config.is_config_block('platform') else ConfigBlock({
+            'class': config['platform']
+        })
+        self.config.defaults({
+            'viewer': {}
+        })
+
         self.model = load_model_from_xml(tostring(manager.xml_tree, encoding="unicode"))
         self.manager = manager
         self.sim = MjSim(self.model)
+        self.viewer = ViewerMJC(self, self.config['viewer'])
+        # self.context = MjRenderContextOffscreen(self.sim)
 
-        interfaces_mjc = {n: InterfaceMJC(n, self.sim, self.model)
-                          for n, c in self.manager.components.items()
-                          if 'mjc' in self.manager.data(n)['interfaces']}
+        interfaces_mjc = {id: InterfaceMJC(id, self)
+                          for id, c in self.manager.components.items()
+                          if 'mjc' in self.manager.data(id)['interfaces']}
 
         self.init_mjc_interfaces(interfaces_mjc)
-        self.interfaces = {n: self.manager.data(n)['interfaces']['mjc'](interfaces_mjc[n])
-                           for n, interface_mjc in interfaces_mjc.items()}
 
-        self.viewer = ViewerMJC(self.sim, viewer_mode)
+        [interf.on_init() for _, interf in interfaces_mjc.items()]
 
-        manager.init_components(self.interfaces)
+        # ** {'config': config['interfaces'][c['name_path']] or ConfigBlock({})}
+
+        self.interfaces = {n: self.manager.data(n)['interfaces']['mjc'](
+            interfaces_mjc[n]
+        ) for n, interface_mjc in interfaces_mjc.items()}
+
+
+        manager.init_components(self.interfaces, config['components'])
+
 
     def init_mjc_interfaces(self, interfaces_mjc):
         """

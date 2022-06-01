@@ -30,6 +30,9 @@ class UR5InterfaceMJC:
         D = 0.1
         self.PIDs = [PID(P, I, D) for a in interface.actuators]
 
+        self.last_query_position = None
+        self.at_target_hit_counter = 0
+
     def move_q(self, q):
         [self.PIDs[qa].setTarget(q[qa] * self.gear) for qa in range(len(q))]
 
@@ -42,9 +45,32 @@ class UR5InterfaceMJC:
         [self.interface.set_ctrl(a, self.PIDs[a].output) for a in range(len(self.interface.actuators))]
 
     def at(self):
-        return self.q
+        return [q / self.gear for q in self.q]
         # pass
         # print(q)
+
+    def is_at(self, q):
+        def similar_q(q1, q2):
+            return sum([abs(q1[i] - q2[i]) for i in range(len(q1))]) < 0.1
+    
+        at = self.at()
+        
+        if self.last_query_position is not None:
+            if similar_q(q, self.last_query_position):
+                self.at_target_hit_counter += 1
+
+                if self.at_target_hit_counter > 30:
+                    self.last_query_position = None
+                    self.at_target_hit_counter = 0
+                    return True
+            
+            else:
+                self.last_query_position = None
+                self.at_target_hit_counter = 0
+
+        self.last_query_position = at
+
+        return False
 
 
 @component(
@@ -58,10 +84,13 @@ class UR5:
     def move_q(self, qs):
         pass
 
-    def is_at(self, p):
+    def at(self):
         pass
 
-    def move_xyz(self, xyz):
+    def is_at(self, q):
+        pass
+
+    def move_xyz(self, xyz, rpy=[0, -pi / 2, pi / 2]):
         # solve ik, call ikfast from Andy Zeng
         #
         # ee_pose = np.array([[0.04071115, - 0.99870914, 0.03037599, 0.0 ],
@@ -75,8 +104,8 @@ class UR5:
         # print()
         # print()
         # print(ee_pose)
-        r = R.from_euler('xyz', [0.1, -180.1, -0.1], degrees=True)
-        ee_pose = np.concatenate([r.as_matrix(), np.array([[-0.8, 0.0, 0.0]]).T], axis=1)
+        r = R.from_euler('xyz', rpy)
+        ee_pose = np.concatenate([r.as_matrix(), np.array([xyz]).T], axis=1)
         # ee_pose = np.concatenate([ee_pose, np.array([[0, 0, 0, 1.0]])])
 
         print(ee_pose)

@@ -29,9 +29,9 @@
     </asset>
     <worldbody>
         <!-- gripper model-->
-        <body name="gripper_structure" pos="-0.03 0 -0.0935" euler="0 0 1.5708">
+        <body name="gripper_structure" pos="0 0 -0.009" zaxis="0 -1 0">
 
-            <body name="gripper_base" pos="0 0 0" euler="0 0 0">
+            <body name="gripper_base" pos="0 0 -0.0935">
                 <site name="grip" pos="0 0.165 0.1" rgba="1 0 1 0" size="0.02 0.02 0.02"/>
                 <geom name="gripper base" type="mesh" material="black_resin" mesh="base0" mass="0.050" contype="32"
                       conaffinity="32"/>
@@ -62,12 +62,8 @@
                         <geom name="g_f4" type="mesh" material="silver" mesh="grip_finger04" mass="0.050" contype="32"
                               conaffinity="32"/>
 
-                        <body name="tip" pos="0 0 0">
-
-                            <!-- Gelsight Sensor -->
-                            <body name="gelsight_0" pos="-0.0765 0.1612 0.0942" euler="0 1.5708 -1.5708">
-                                <!--                            <include file="textures/gelsight.xml"/>-->
-                            </body>
+                        <body name="left_tip" pos="-0.053 0.1115 0.0925" zaxis="0 1 0">
+                            <!-- nested tip element -->
                         </body>
                     </body>
                 </body>
@@ -97,13 +93,8 @@
                                stiffness=".02" springref="-2"/>
                         <geom name="g_f4_1" type="mesh" material="silver" mesh="grip_finger14" mass="0.050" contype="32"
                               conaffinity="32"/>
-
-                        <body name="tip_1" pos="0 0 0">
-
-                            <!-- Gelsight Sensor -->
-                            <body name="gelsight_1" pos="0.0765 0.1612 0.095" euler="0 -1.5708 -1.5708">
-                                <!--                            <include file="textures/gelsight_mountable1.xml"/>-->
-                            </body>
+                        <body name="right_tip" pos="0.053 0.1115 0.0925" zaxis="0 1 0">
+                            <!-- nested tip element -->
                         </body>
                     </body>
                 </body>
@@ -113,10 +104,20 @@
     <!--    Joints requiring a child body to have two parents-->
     <equality>
         <!-- LHS -->
-        <connect name="f2_to_f4" active="true" body1="f2" body2="f4" anchor="-0.069 0.098 .0935" solref="0.01 7"
+        <connect name="f2_to_f4"
+                 active="true"
+                 body1="f2"
+                 body2="f4"
+                 anchor="-0.069 0.098 .0935"
+                 solref="0.01 7"
                  solimp="1 1 0.5 1 1"/>
         <!-- RHS -->
-        <connect name="f2_to_f4_1" active="true" body1="f2_1" body2="f4_1" anchor="0.069 0.098 .0935" solref="0.01 7"
+        <connect name="f2_to_f4_1"
+                 active="true"
+                 body1="f2_1"
+                 body2="f4_1"
+                 anchor="0.069 0.098 .0935"
+                 solref="0.01 7"
                  solimp="1 1 0.5 1 1"/>
     </equality>
 
@@ -127,4 +128,9 @@
         <motor gear="100" name="finger1_joint1_motor" joint="finger1_joint0" ctrllimited="true"
                ctrlrange="-0.03 0.03" forcelimited="true" forcerange="-0.03 0.03"/>
     </actuator>
+    <sensor>
+        <actuatorpos name="finger_joint0_sensor" actuator="finger0_joint1_motor"/>
+        <actuatorpos name="finger_joint1_sensor" actuator="finger1_joint1_motor"/>
+    </sensor>
 </mujoco>
+
