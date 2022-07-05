@@ -6,10 +6,10 @@ import numpy as np
 import cv2
 import os
 
-from yarok.components.geltip.simulation_model.model import SimulationApproach
-from yarok.components.geltip.simulation_model.utils import normalize_vectors
+# from yarok.components.geltip.simulation_model.model import SimulationApproach
+# from yarok.components.geltip.simulation_model.utils import normalize_vectors
 
-import open3d as o3d
+# import open3d as o3d
 import math
 
 from time import time
@@ -45,6 +45,8 @@ class GelTipInterfaceMJC:
         cloud_size = (160, 120)
         method = 'geo'
         prefix = str(cloud_size[0]) + 'x' + str(cloud_size[1])
+
+        return
 
         cloud = np.load(base + '/fields/' + prefix + '_ref_cloud.npy')
         cloud = cloud.reshape((cloud_size[1], cloud_size[0], 3))
@@ -84,16 +86,17 @@ class GelTipInterfaceMJC:
 
     def read(self, shape=(480, 640)):
         t = time()
-        if self.last_update > t - 0.25:
-            return self.tactile_rgb
+        if self.last_update > t - 0.1:
+            return self.raw_depth
+        rgb, depth = self.interface.read_camera('camera', shape, depth=True, rgb=True)
 
         self.last_update = t
-        rgb, depth = self.interface.read_camera('camera', shape, depth=True, rgb=True)
         self.raw_rgb = rgb
         self.raw_depth = depth
 
-        # print(frame.shape)
+        # print(self.raw_depth.shape)
         # self.raw_depth = frame[1]
+        return self.raw_depth
 
         o3d_cloud = get_cloud_from_depth(self.cam_matrix, self.raw_depth * 10)
         o3d_cloud_raw_pts = np.asarray(o3d_cloud.points)
@@ -146,30 +149,59 @@ class GelTipInterfaceHW:
             <asset>
                 <material name="white_elastomer" rgba="1 1 1 1"/>
                 <material name="black_plastic" rgba=".3 .3 .3 1"/>
+                
+                <material name="label_color" rgba="${label_color} 1.0"/>
         
                 <mesh name="geltip_shell" file="meshes/shell_open.stl" scale="0.001 0.001 0.001"/>
                 <mesh name="geltip_sleeve" file="meshes/sleeve_open.stl" scale="0.001 0.001 0.001"/>
                 <mesh name="geltip_mount" file="meshes/mount.stl" scale="0.001 0.001 0.001"/>
-                <mesh name="geltip_glass" file="meshes/glass_long.stl" scale="0.001 0.001 0.001"/>
                 
-                <!-- making the meshes slightly larger/smaller avoids wierd collisions -->
-                <mesh name="geltip_elastomer" file="meshes/elastomer_long.stl" scale="0.0013 0.0012 0.0012"/>
-                <mesh name="geltip_elastomer_inv" file="meshes/elastomer_long_inv.stl" scale="0.001 0.001 0.001"/>
+                <!-- the glass -->
+                <mesh name="geltip_glass" file="meshes/glass_long.stl" scale="0.001 0.001 0.001"/>
+                <!-- the outter elastomer -->
+                <mesh name="geltip_elastomer" file="meshes/elastomer_long.stl" scale="0.00115 0.00115 0.00105"/>  
+                <!-- inverted mesh, for limiting the depth map-->
+                <mesh name="geltip_elastomer_inv" file="meshes/elastomer_long_inv.stl" scale="0.00115 0.00115 0.00105"/>
         
             </asset>
             <worldbody>
                 <body name="geltip">
+                    <geom type="sphere" 
+                        density="0.1"
+                        material="label_color" 
+                        size="0.005" 
+                        pos="0.0 0.012 -0.025"/>
                     <geom density="0.1" type="mesh" mesh="geltip_shell" material="black_plastic"/>
                     <geom density="0.1" type="mesh" mesh="geltip_sleeve" material="black_plastic"/>
                     <geom density="0.1" type="mesh" mesh="geltip_mount" material="black_plastic"/>
-                    <geom density="0.1" type="mesh" mesh="geltip_elastomer_inv" 
-                          material="white_elastomer" />
-                   <!-- <geom density="0.1" type="mesh" mesh="geltip_elastomer" 
-                          friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"
-                          contype="-1" conaffinity="-1"
-                          material="white_elastomer"/> -->
-        
                     <camera name="camera" pos="0 0 0.01" zaxis="0 0 -1" fovy="70"/>
+                    <body>
+                    
+                        <!-- mesh, to serve as the glass and detect collisions -->
+                        <geom density="0.1" type="mesh" 
+                              mesh="geltip_glass" 
+                              solimp="1.0 1.2 0.001 0.5 2" 
+                              solref="0.02 1"
+                              material="white_elastomer" />
+                              
+                        <!-- inverted, mmesh, for limiting the depth-map -->      
+                        <geom density="0.1" 
+                              type="mesh" 
+                              mesh="geltip_elastomer_inv" 
+                              contype="-1" 
+                              conaffinity="-1"
+                              material="white_elastomer" />
+                       
+                       <!-- white elastomer, for visual purposes -->
+                       <geom density="0.1" 
+                              type="mesh" 
+                              mesh="geltip_elastomer" 
+                              friction="1 0.05 0.01" 
+                              contype="-1" 
+                              conaffinity="-1"
+                              material="white_elastomer"/> 
+                    </body>
+        
                 </body>
             </worldbody>
         </mujoco>

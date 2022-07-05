@@ -1,6 +1,6 @@
 from xml.etree.ElementTree import tostring
 
-from mujoco_py import MjSim, load_model_from_xml, MjRenderContextOffscreen
+# from mujoco import MjSim, load_model_from_xml, MjRenderContextOffscreen
 
 from ..components_manager import ComponentsManager
 from ..config import ConfigBlock

@@ -1,7 +1,7 @@
-from mujoco_py import MjRenderContextOffscreen, MjRenderContextWindow, MjRenderContext
+# from mujoco import MjRenderContextOffscreen, MjRenderContextWindow, MjRenderContext
 
 import numpy as np
-
+import mujoco
 
 class InterfaceMJC:
     """
@@ -15,19 +15,26 @@ class InterfaceMJC:
         global offscreen_id
         self.component_name = name
         self.platform = platform
-        self.sensor_name2id = {}
-        self.actuator_name2id = {}
-        self.camera_name2id = {}
+        self.sensor_name2adr = {}
+        self.actuator_name2adr = {}
+        self.cam_name2adr = {}
+        self.sensor_name2idx = {}
+        self.actuator_name2idx = {}
+        self.cam_name2idx = {}
         self.actuators = []
         self.sensors = []
-        self.cameras = []
+        self.cams = []
         self.component_name = ''
         self.contexts = {}
+        self.scn = mujoco.MjvScene(self.platform.model, maxgeom=10000)
+        self.vopt = mujoco.MjvOption()
+        self.pert = mujoco.MjvPerturb()
+
 
     def on_init(self):
         self.contexts = {
-            cam_name: MjRenderContext(sim=self.platform.sim, device_id=0, offscreen=True, opengl_backend='glfw')
-            for cam_name in self.camera_name2id
+             cam_name: mujoco.MjrContext(self.platform.model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
+            for cam_name in self.cam_name2adr
         }
 
     # https://github.com/htung0101/table_dome/blob/master/table_dome_calib/utils.py#L160
@@ -40,10 +47,10 @@ class InterfaceMJC:
 
     def set_ctrl(self, k, v):
         actuator_name = self.actuators[k] if type(k) == int else k
-        self.platform.sim.data.ctrl[self.actuator_name2id[actuator_name]] = v
+        self.platform.data.ctrl[self.actuator_name2idx[actuator_name]] = v
 
     def sensordata(self):
-        return [self.platform.sim.data.sensordata[self.sensor_name2id[sn]] for sn in self.sensors]
+        return [self.platform.data.sensordata[self.sensor_name2idx[sn]] for sn in self.sensors]
 
     def read_camera(self, camera_name, shape=(480, 640), depth=False, rgb=True):
         """
@@ -58,9 +65,33 @@ class InterfaceMJC:
         """
 
         context = self.contexts[camera_name]
-        camera_id = self.camera_name2id[camera_name]
+        camera_id = self.cam_name2idx[camera_name]
+
 
         self.depth_arr = np.zeros((480, 640), dtype=np.float32)
+        self.rgb = np.zeros((480, 640, 3), dtype=np.uint8)
+
+
+        viewport = mujoco.MjrRect(0, 0, 640, 480)
+
+        cam = mujoco.MjvCamera()
+        cam.type = 2
+        cam.fixedcamid = camera_id
+
+        mujoco.mjv_updateScene(
+            self.platform.model,
+            self.platform.data,
+            self.vopt,
+            self.pert,
+            cam,
+            mujoco.mjtCatBit.mjCAT_ALL.value,
+            self.scn)
+
+        mujoco.mjv_defaultCamera(cam)
+        mujoco.mjr_render(viewport, self.scn, context)
+        mujoco.mjr_readPixels(self.rgb, self.depth_arr, viewport, context)
+
+        return self.rgb, self.depth_arr
 
         context.render(height=shape[0],
                        width=shape[1],

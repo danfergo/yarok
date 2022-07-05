@@ -101,7 +101,7 @@ class GraspRoleBehaviour:
         self.arm.move_q(q)
         wait(lambda: self.arm.is_at(q))
 
-        self.gripper.move(0.75)
+        self.gripper.move(0.78)
 
         def x():
             global i

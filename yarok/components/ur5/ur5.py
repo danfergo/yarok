@@ -4,12 +4,12 @@ from yarok.utils.PID import PID
 from yarok.components_manager import component
 
 import numpy as np
-from .ikfastpy import ikfastpy
+# from .ikfastpy import ikfastpy
 from scipy.spatial.transform import Rotation as R
 
 # Initialize kinematics for UR5 robot arm
-ur5_kin = ikfastpy.PyKinematics()
-n_joints = ur5_kin.getDOF()
+# ur5_kin = ikfastpy.PyKinematics()
+# n_joints = ur5_kin.getDOF()
 
 
 class UR5InterfaceMJC:
@@ -25,10 +25,18 @@ class UR5InterfaceMJC:
         ]
         self.gear = 100
         self.q = initial_q
-        P = 1
-        I = 0.1
-        D = 0.1
-        self.PIDs = [PID(P, I, D) for a in interface.actuators]
+        # P = 0.5
+        # I = 0.1
+        # D = 0.1
+        self.pid_values = [
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+            {'p': 1, 'i': 0.1, 'd': 0.1},
+        ]
+        self.PIDs = [PID(pid['p'], pid['i'], pid['d']) for pid in self.pid_values]
 
         self.last_query_position = None
         self.at_target_hit_counter = 0
@@ -51,10 +59,9 @@ class UR5InterfaceMJC:
 
     def is_at(self, q):
         def similar_q(q1, q2):
-            return sum([abs(q1[i] - q2[i]) for i in range(len(q1))]) < 0.1
-    
+            return sum([abs(q1[i] - q2[i]) for i in range(len(q1))]) < 0.05
+
         at = self.at()
-        
         if self.last_query_position is not None:
             if similar_q(q, self.last_query_position):
                 self.at_target_hit_counter += 1
@@ -63,7 +70,7 @@ class UR5InterfaceMJC:
                     self.last_query_position = None
                     self.at_target_hit_counter = 0
                     return True
-            
+
             else:
                 self.last_query_position = None
                 self.at_target_hit_counter = 0

@@ -14,6 +14,12 @@ config = {
         'components': {
             '/': {
                 'object': 'cone'
+            },
+            '/geltip1': {
+                'label_color': '1.0 0.0 0.0'
+            },
+            '/geltip2': {
+                'label_color': '0.0 1.0 0.0'
             }
         }
     },

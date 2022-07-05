@@ -27,6 +27,7 @@ setup(
     keywords=['yarok', 'robot', 'framework', 'mujoco'],  # arbitrary keywords
     classifiers=[],
     install_requires=[
-        'mujoco_py',
+        'mujoco',
+        'mujoco-python-viewer'
     ]
 )

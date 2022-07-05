@@ -11,20 +11,24 @@ import cv2
 
 __PLATFORM__ = None
 __INSPECTOR__ = None
+__CONFIG__ = None
 
 
 def get(config, key, default):
     return config[key] if key in config else default
 
 
-def wait(fn):
-    global __PLATFORM__, __INSPECTOR__
+def wait(fn=None):
+    global __PLATFORM__, __INSPECTOR__, __CONFIG__
 
     while True:
         __PLATFORM__.step()
         if __INSPECTOR__ is not None:
             __INSPECTOR__.probe()
-        if fn():
+        if __CONFIG__ is not None and 'callbacks' in __CONFIG__:
+            [cb(__PLATFORM__) for cb in __CONFIG__['callbacks']]
+        if fn is not None and fn():
+            cv2.waitKey(1)
             break
         cv2.waitKey(1)
 
@@ -66,7 +70,7 @@ def run(config={}):
         __INSPECTOR__ = Inspector(manager, platform)
 
     __PLATFORM__ = platform
-
+    __CONFIG__ = config
     if behaviour is not None:
         def get_component(c):
             if c == 'world':

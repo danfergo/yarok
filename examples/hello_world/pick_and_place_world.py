@@ -6,7 +6,7 @@ from yarok.components_manager import component
 from yarok.components.robotiq_2f85.robotiq_2f85 import robotiq_2f85
 from yarok.components.ur5.ur5 import UR5
 from yarok.components.gelsight.gelsight2014 import gelsight2014
-from yarok.components.geltip.geltip import geltip
+from yarok.components.geltip.geltip import GelTip
 
 
 class PickAndPlaceWorldInterfaceMJC:
@@ -27,7 +27,7 @@ class PickAndPlaceWorldInterfaceMJC:
         UR5,
         robotiq_2f85,
         gelsight2014,
-        geltip,
+        GelTip,
         AnetA30,
         Cam
     ],

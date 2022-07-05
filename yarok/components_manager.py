@@ -6,7 +6,6 @@ import sys
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import tostring
 
-from mujoco_py import load_model_from_xml, MjSim
 from .config import ConfigBlock
 
 # attributes that are renamed from 'name' to 'id'
@@ -30,6 +29,15 @@ EXTENDABLE_BLOCKS_NAMES = [
     'actuator',
     'equality'
 ]
+
+
+def stringify(el):
+    """ used to construct exception messages """
+    """ returns  """
+    return tostring(el, encoding="unicode") \
+               .replace('\n', '') \
+               .strip() \
+               .split('>')[0] + '>'
 
 
 class ComponentsManager:
@@ -66,7 +74,7 @@ class ComponentsManager:
             'id': self.gen_id(),
             'parent': None,
             'children': [],
-            'config': components_config['/']
+            'config': components_config['/'] if components_config is not None else {}
         }
         self.xml_tree = self.load_tree(self.components_tree)
 
@@ -135,7 +143,8 @@ class ComponentsManager:
         # loads xml tree from xml path
         tree = ET.fromstring(template) if template is not None else ET.parse(xml_path).getroot()
 
-        # re-pathing all file refs, that are not absolute refs, to be relative to the .xml file
+        # re-pathing all file refs, that are not absolute refs,
+        # to be relative to the .xml file
         dir_path = str(pathlib.Path(xml_path).parent.resolve())
         for e in tree.iter():
             if 'file' in e.attrib and not e.attrib['file'].startswith('/'):
@@ -147,8 +156,16 @@ class ComponentsManager:
             for el in els:
                 if el.tag == 'worldbody':
                     continue
-                # if not is_component(el):
-                self.parse_attributes(el, comp)
+                try:
+                    self.parse_attributes(el, comp)
+                except Exception as e:
+                    c_path = comp['name_path']
+                    raise Exception('\n\n' + e.args[0]
+                                    + ',\nfor ' + c_path
+                                    + ',\n\nplease patch yarok config with { components: { ' + c_path + ' : { ' + e.args[
+                                        1] + ': <value> }}}  '
+                                    )
+
                 for attr in RENAME_KEYS_ATTRS_NAMES:
                     if attr in el.attrib:
                         el.attrib[attr] = id + ':' + el.attrib[attr]
@@ -162,7 +179,6 @@ class ComponentsManager:
 
             for element in elements:
                 tag = element.tag
-
 
                 if tag in EXTENDABLE_BLOCKS_NAMES:
                     continue
@@ -189,7 +205,8 @@ class ComponentsManager:
                         'parent': parent_component,
                         'children': []
                     }
-                    sub_component['config'] = self.components_config[sub_component['name_path']]
+                    sub_component['config'] = self.components_config[
+                        sub_component['name_path']] if self.components_config is not None else {}
 
                     # appends the newly found sub component to the previous/parent component
                     parent_component['children'].append(sub_component)
@@ -213,9 +230,7 @@ class ComponentsManager:
                                 ".//body[@name='" + (sub_component['id'] + ':' + parentName) + "']")
                             if parent is None:
                                 raise KeyError('Failed to nest ' +
-                                               tostring(nested_element, encoding="unicode").replace('\n',
-                                                                                                    '').strip().split(
-                                                   '>')[0] + '>,' +
+                                               stringify(nested_element) + '>,' +
                                                ' body[name=' +
                                                parentName +
                                                '] not being found in ' + sub_component['tag'] + ' template.')
@@ -230,12 +245,14 @@ class ComponentsManager:
                 else:
                     walk_tree(list(element), comp)
 
+                try:
+                    self.parse_attributes(element, comp)
+                except Exception as e:
+                    raise Exception(e.args[0] + ',\nfor ' + str(comp))
 
-                self.parse_attributes(element, comp)
                 for attr in RENAME_KEYS_ATTRS_NAMES:
                     if attr in element.attrib:
                         element.attrib[attr] = parent_component['id'] + ':' + element.attrib[attr]
-
 
         walk_tree(tree, comp)
 
@@ -244,7 +261,11 @@ class ComponentsManager:
     def parse_attributes(self, elem, comp):
         def set(k, v):
             elem.attrib[k] = v
-        {set(k, self.replace_all(v, comp['config'])) for k, v in elem.attrib.items() if "$" in v}
+
+        try:
+            {set(k, self.replace_all(v, comp['config'])) for k, v in elem.attrib.items() if "$" in v}
+        except Exception as e:
+            raise Exception(e.args[0] + ',\nfor ' + stringify(elem), e.args[1])
 
     def replace_all(self, attr, config):
         # not very pretty code, but it works
@@ -258,8 +279,11 @@ class ComponentsManager:
             offset = o['offset']
             k = match.group(2)
             s = match.span(2)
-            if k not in config:
-                raise Exception('Config "' + k + '" not found !')
+            if k not in (config or {}):
+                raise Exception(
+                    'Failed to find config "' + k + '" while parsing "' + attr + '".',
+                    k
+                )
 
             o['txt'] = txt[: offset + s[0] - 2] + config[k] + txt[offset + s[1] + 1:]
             # offset is used to compensate the "original" spans

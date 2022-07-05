@@ -1,18 +1,25 @@
 from xml.etree.ElementTree import tostring
 
-from mujoco_py import MjSim, load_model_from_xml, MjRenderContextOffscreen
+import mujoco
+from mujoco import MjModel
 
 from ..components_manager import ComponentsManager
 from ..mjc.interface import InterfaceMJC
 from ..mjc.viewer import ViewerMJC
 from ..config import ConfigBlock
 
+import numpy as np
+import cv2
+
 INTERFACES_COMPONENTS_NAMES = [
     'sensor',
     'actuator',
-    'camera'
+    'cam'
 ]
 
+
+def adr2name(model, adr):
+    return model.names[adr:].decode().split("\x00")[0]
 
 class PlatformMJC:
     """
@@ -36,10 +43,13 @@ class PlatformMJC:
             'viewer': {}
         })
 
-        self.model = load_model_from_xml(tostring(manager.xml_tree, encoding="unicode"))
+        self.model = MjModel.from_xml_string(tostring(manager.xml_tree, encoding="unicode"))
+        self.data = mujoco.MjData(self.model)
+
         self.manager = manager
-        self.sim = MjSim(self.model)
+        # self.sim = MjSim(self.model)
         self.viewer = ViewerMJC(self, self.config['viewer'])
+
         # self.context = MjRenderContextOffscreen(self.sim)
 
         interfaces_mjc = {id: InterfaceMJC(id, self)
@@ -66,15 +76,19 @@ class PlatformMJC:
         """
 
         for item in INTERFACES_COMPONENTS_NAMES:
-            for idx in range(len(getattr(self.model, item + '_names'))):
-                abs_name = getattr(self.model, item + '_id2name')(idx)
+           # print((self.model.names.decode('utf-8')))
+           # print((self.model.nnames))
+
+            for idx, adr in enumerate(getattr(self.model, 'name_' + item + 'adr')):
+                abs_name = adr2name(self.model, adr) #getattr(self.model, item + '_id2name')(idx)
                 col_idx = abs_name.index(':')
                 component_name = abs_name[:col_idx]
                 item_name = abs_name[col_idx + 1:]
 
                 if component_name in interfaces_mjc:
                     interface = interfaces_mjc[component_name]
-                    getattr(interface, item + '_name2id')[item_name] = idx
+                    getattr(interface, item + '_name2idx')[item_name] = idx
+                    getattr(interface, item + '_name2adr')[item_name] = adr
                     getattr(interface, item + 's').append(item_name)
                     interface.component_name = component_name
 
@@ -82,6 +96,7 @@ class PlatformMJC:
         """
             Steps through all the interfaces
         """
-        self.sim.step()
+        mujoco.mj_step(self.model, self.data)
         _ = {self.interfaces[i].step() for i in self.interfaces if hasattr(self.interfaces[i], 'step')}
         self.viewer.step()
+
