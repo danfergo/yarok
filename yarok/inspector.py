@@ -41,7 +41,7 @@ class Inspector:
                 # self.platform.sim.step()
                 # self.platform.viewer.step()
 
-
-                            # print(comp['name'])
-                            # cv2.waitKey(-1)
+                # print(comp['name'])
+                # cv2.waitKey(-1)
             # self.next_probe_ts = time.time() + self.probe_interval + 999999999999999
+            cv2.waitKey(1)

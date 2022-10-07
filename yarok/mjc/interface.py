@@ -3,6 +3,7 @@
 import numpy as np
 import mujoco
 
+
 class InterfaceMJC:
     """
         This Interface serves as a simplified MuJoCo api,
@@ -30,10 +31,9 @@ class InterfaceMJC:
         self.vopt = mujoco.MjvOption()
         self.pert = mujoco.MjvPerturb()
 
-
     def on_init(self):
         self.contexts = {
-             cam_name: mujoco.MjrContext(self.platform.model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
+            cam_name: mujoco.MjrContext(self.platform.model, mujoco.mjtFontScale.mjFONTSCALE_150.value)
             for cam_name in self.cam_name2adr
         }
 
@@ -67,12 +67,10 @@ class InterfaceMJC:
         context = self.contexts[camera_name]
         camera_id = self.cam_name2idx[camera_name]
 
+        self.depth_arr = np.zeros(shape, dtype=np.float32)
+        self.rgb = np.zeros(shape + (3,), dtype=np.uint8)
 
-        self.depth_arr = np.zeros((480, 640), dtype=np.float32)
-        self.rgb = np.zeros((480, 640, 3), dtype=np.uint8)
-
-
-        viewport = mujoco.MjrRect(0, 0, 640, 480)
+        viewport = mujoco.MjrRect(0, 0, shape[1], shape[0])
 
         cam = mujoco.MjvCamera()
         cam.type = 2
@@ -91,27 +89,8 @@ class InterfaceMJC:
         mujoco.mjr_render(viewport, self.scn, context)
         mujoco.mjr_readPixels(self.rgb, self.depth_arr, viewport, context)
 
-        return self.rgb, self.depth_arr
-
-        context.render(height=shape[0],
-                       width=shape[1],
-                       camera_id=camera_id
-                       )
-        if rgb:
-            rgb, d = context.read_pixels(
-                height=shape[0],
-                width=shape[1],
-                depth=True
-            )
-
-            if depth:
-                return rgb[::-1, :, :], \
-                       self.depthimg2Meters(d)[::-1, :]
-            else:
-                return rgb
-
-        else:
-            self.context_offscreen.read_pixels_depth(
-                self.depth_arr
-            )
-            return self.depth_arr
+        if not depth:
+            return self.rgb
+        elif not rgb:
+            return self.depthimg2Meters(self.depth_arr)
+        return self.rgb, self.depthimg2Meters(self.depth_arr)

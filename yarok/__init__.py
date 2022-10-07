@@ -8,17 +8,19 @@ from .config import ConfigBlock
 import inspect
 
 import cv2
+import time
 
 __PLATFORM__ = None
 __INSPECTOR__ = None
 __CONFIG__ = None
+__ENV_CONFIG__ = None
 
 
 def get(config, key, default):
     return config[key] if key in config else default
 
 
-def wait(fn=None):
+def wait(fn=None, cb=None):
     global __PLATFORM__, __INSPECTOR__, __CONFIG__
 
     while True:
@@ -28,27 +30,23 @@ def wait(fn=None):
         if __CONFIG__ is not None and 'callbacks' in __CONFIG__:
             [cb(__PLATFORM__) for cb in __CONFIG__['callbacks']]
         if fn is not None and fn():
-            cv2.waitKey(1)
+            # cv2.waitKey(1)
+            # time.sleep(0.0001)
             break
-        cv2.waitKey(1)
+        if cb is not None:
+            cb()
+        # cv2.waitKey(1)
+        # time.sleep(0.0001)
 
+def wait_seconds(seconds, cb=None):
+    start_seconds = time.time()
+    wait(lambda: time.time() - start_seconds > seconds, cb)
 
-def load(world, env_config: ConfigBlock):
-    manager = ComponentsManager(
-        world,
-        env_config['components']
-    )
+def wait_forever(cb=None):
+    wait(lambda: False, cb)
 
-    platform_class = env_config['platform']['class'] \
-        if env_config.is_config_block('platform') else env_config['platform']
-
-    platform = platform_class(manager, env_config)
-
-    return platform, manager
-
-
-def run(config={}):
-    global __PLATFORM__, __INSPECTOR__, __CONFIG__
+def load(config: {}):
+    global __PLATFORM__, __INSPECTOR__, __CONFIG__, __ENV_CONFIG__
 
     config = ConfigBlock(config)
     config.defaults({
@@ -59,24 +57,40 @@ def run(config={}):
     })
 
     world = config['world']
-    behaviour = config['behaviour']
     env = config['defaults']['environment']
     env_config = config['environments'][env]
     env_config.defaults(config['defaults'] if 'defaults' in config else {})
 
-    platform, manager = load(world, env_config)
+    manager = ComponentsManager(
+        world,
+        env_config['components']
+    )
 
-    if env_config['inspector']:
-        __INSPECTOR__ = Inspector(manager, platform)
+    platform_class = env_config['platform']['class'] \
+        if env_config.is_config_block('platform') else env_config['platform']
+
+    platform = platform_class(manager, env_config)
 
     __PLATFORM__ = platform
     __CONFIG__ = config
+    __ENV_CONFIG__ = env_config
+    if env_config['inspector']:
+        __INSPECTOR__ = Inspector(manager, platform)
+
+    return platform, manager
+
+
+def run(config={}):
+    platform, manager = load(config)
+
+    behaviour = config['behaviour']
+
     if behaviour is not None:
         def get_component(c):
             if c == 'world':
                 return manager.components_tree['instance']
             elif c == 'config':
-                return env_config['behaviour']
+                return __ENV_CONFIG__['behaviour']
             else:
                 return manager.get_by_name(manager.components_tree, c)['instance']
 
@@ -86,6 +100,11 @@ def run(config={}):
 
         components = {c: get_component(c) for c in init_annotations}
         bh = behaviour(**components)
-        bh.wake_up()
+        if hasattr(bh, 'on_start'):
+            bh.on_start()
 
-    wait(lambda: False)
+        if hasattr(bh, 'on_update'):
+            while True:
+                if bh.on_update() == False:
+                    break
+                wait() # loops once.
