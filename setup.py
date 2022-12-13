@@ -21,10 +21,9 @@ setup(
             'yarok = yarok.__main__:main'
         ],
     },
-    # scripts=['bin/lidaco'],
     author_email='danfergo@gmail.com',
-    url='https://github.com/danfergo/yarok',  # use the URL to the github repo
-    keywords=['yarok', 'robot', 'framework', 'mujoco'],  # arbitrary keywords
+    url='https://github.com/danfergo/yarok',
+    keywords=['yarok', 'robot', 'framework', 'mujoco'],
     classifiers=[],
     install_requires=[
         'mujoco',

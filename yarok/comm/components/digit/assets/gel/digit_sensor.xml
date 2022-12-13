@@ -1,0 +1,9 @@
+<mujoco>
+
+
+        <!-- Extrinsic Agent Cam -->
+        <!-- <body>
+            <camera name="extrinsic_cam" mode="fixed" pos="-0.8 0 1.4" euler="0 5.5 -1.5708" fovy="50"/>
+        </body> -->
+
+</mujoco>

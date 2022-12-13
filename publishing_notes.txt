@@ -1,5 +1,6 @@
 rm -rf build && rm -rf dist
 
+# yarok.__main__ __VERSION__ string to  0.0.X
 git add *
 git commit -m "saving changes in preparation for version 0.0.X"
 
