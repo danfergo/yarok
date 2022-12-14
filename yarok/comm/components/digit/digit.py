@@ -1,5 +1,5 @@
-from yarok import ConfigBlock, Platform, component
-from yarok.platforms.mjc.interface import InterfaceMJC
+from yarok import ConfigBlock, Platform, component, interface
+from yarok.platforms.mjc import InterfaceMJC
 
 import numpy as np
 import cv2
@@ -12,49 +12,41 @@ from .utils.phong_render import PhongRender
 
 gel_width, gel_height = 240, 320
 
-
-def get_simapproach():
-    # load the image taken from a real digit sensor
-
-    __location__ = os.path.realpath(
-        os.path.join(os.getcwd(), os.path.dirname(__file__)))
-
-    model_path = os.path.join(__location__, './assets/gel/digit_bg.npy')
-    background_img = np.load(model_path)
-    # Phong render params
-    ## sensor light sources
-    light_sources_digit = [
-        {'position': [-0.866, 0.5, 0.25], 'color': (108, 82, 255), 'kd': 0.1, 'ks': 0.4},
-        # red, bottom (108, 82, 255) kd0.6
-        {'position': [0.866, 0.5, 0.25], 'color': (120, 255, 153), 'kd': 0.1, 'ks': 0.4},  # green, left (120, 255, 153)
-        {'position': [0, -1, 0.25], 'color': (255, 130, 115), 'kd': 0.3, 'ks': 0.4},  # blue, left (255, 130, 115)
-    ]
-
-    ## calculation attributes
-    ka = 1.0
-    px2m_ratio = 5.4347826087e-05
-    elastomer_thickness = 0.003
-    min_depth = 0.04
-    texture_sigma = 0.00001
-
-    simulation = PhongRender(
-        light_sources=light_sources_digit,
-        background_img=background_img,
-        ka=ka,
-        texture_sigma=texture_sigma,
-        px2m_ratio=px2m_ratio,
-        elastomer_thickness=elastomer_thickness,
-        min_depth=min_depth,
-    )
-
-    return simulation
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
+@interface(
+    defaults={
+        'light_sources': [
+            {'position': [-0.866, 0.5, 0.25], 'color': (108, 82, 255), 'kd': 0.1, 'ks': 0.4},
+            # red, bottom (108, 82, 255) kd 0.6
+            {'position': [0.866, 0.5, 0.25], 'color': (120, 255, 153), 'kd': 0.1, 'ks': 0.4},
+            # green, left (120, 255, 153)
+            {'position': [0, -1, 0.25], 'color': (255, 130, 115), 'kd': 0.3, 'ks': 0.4},
+            # blue, left (255, 130, 115)
+        ],
+        'background_img': np.load(os.path.join(__location__, './assets/gel/digit_bg.npy')),
+        'ka': 1.0,
+        'texture_sigma': 0.00001,
+        'px2m_ratio': 5.4347826087e-05,
+        'elastomer_thickness': 1.0,
+        'min_depth': 0.0
+    }
+)
 class DigitInterfaceMJC:
 
-    def __init__(self, interface: InterfaceMJC):
+    def __init__(self, interface: InterfaceMJC, config: ConfigBlock):
         self.interface = interface
-        self.simulation = get_simapproach()
+        self.simulation = PhongRender(
+            light_sources=config['light_sources'],
+            background_img=config['background_img'],
+            ka=config['ka'],
+            texture_sigma=config['texture_sigma'],
+            px2m_ratio=config['px2m_ratio'],
+            elastomer_thickness=config['elastomer_thickness'],
+            min_depth=config['min_depth']
+        )
         self.last_update = 0
         self.depth = np.zeros((320, 240), np.float32)
 
@@ -63,7 +55,7 @@ class DigitInterfaceMJC:
         if self.last_update > t - 0.2:
             return self.tactile
         self.last_update = t
-        self.depth = self.interface.read_camera('digit0:camera', shape, depth=True, rgb=False)
+        self.depth = self.interface.read_camera('digit0:camera', shape, depth='raw', rgb=False)
         self.tactile = self.simulation.generate(self.depth).astype(np.uint8)
 
         return self.tactile

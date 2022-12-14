@@ -14,28 +14,25 @@ class Platform(ABC):
         self.env_config = env_config
         self.behaviour = behaviour
         self.config = env_config['platform'] if 'platform' in env_config else ConfigBlock({})
+
         self.injector = Injector(self, self.manager.components_tree)
 
-        self.plugins = self.init_plugins(env_config['plugins'])
+        self.plugins = [self.init_plugin(pl_tuple) for pl_tuple in env_config['plugins']]
 
-    def init_plugins(self, env_plugins):
-        def init_plugin(plugin_tuple):
+    def init_plugin(self, plugin_tuple):
 
-            if callable(plugin_tuple):
-                return plugin_tuple
+        if callable(plugin_tuple):
+            return plugin_tuple
 
-            plugin_cls = plugin_tuple[0] if type(plugin_tuple) is tuple else plugin_tuple
-            plugin_conf = ConfigBlock(plugin_tuple[1] if type(plugin_tuple) is tuple else {})
+        plugin_cls = plugin_tuple[0] if type(plugin_tuple) is tuple else plugin_tuple
+        plugin_conf = ConfigBlock(plugin_tuple[1] if type(plugin_tuple) is tuple else {})
 
+        injector = Injector(self, self.manager.components_tree, plugin_conf)
+        class_members = {t[0]: t[1] for t in inspect.getmembers(plugin_cls)}
+        init_members = {t[0]: t[1] for t in inspect.getmembers(class_members['__init__'])}
+        init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
 
-            injector = Injector(self, self.manager.components_tree, plugin_conf)
-            class_members = {t[0]: t[1] for t in inspect.getmembers(plugin_cls)}
-            init_members = {t[0]: t[1] for t in inspect.getmembers(class_members['__init__'])}
-            init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
-
-            return plugin_cls(**injector.get_all(init_annotations))
-
-        return [init_plugin(pl_tuple) for pl_tuple in env_plugins]
+        return plugin_cls(**injector.get_all(init_annotations))
 
     @staticmethod
     def create(config: ConfigBlock):

@@ -1,6 +1,7 @@
 from yarok.core.components_manager import ComponentsManager
 from yarok.core.config_block import ConfigBlock
 from yarok.core.component import component
+from yarok.core.interface import interface
 from yarok.core.platform import Platform
 from yarok.core.injector import Injector
 

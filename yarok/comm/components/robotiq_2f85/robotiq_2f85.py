@@ -1,12 +1,14 @@
-from yarok import component
+from yarok import component, interface
+from yarok.platforms.mjc import InterfaceMJC
 
 from yarok.comm.utils.PID import PID
 from math import pi
 
 
+@interface()
 class Robotiq2f85MJCInterfaceMJC:
 
-    def __init__(self, interface):
+    def __init__(self, interface: InterfaceMJC):
         self.interface = interface
         P = 0.001
         I = 0

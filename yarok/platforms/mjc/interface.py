@@ -90,6 +90,9 @@ class InterfaceMJC:
 
         if not depth:
             return self.rgb
-        elif not rgb:
-            return self.depthimg2Meters(self.depth_arr)
-        return self.rgb, self.depthimg2Meters(self.depth_arr)
+        d = self.depth_arr if depth == 'raw' else self.depthimg2Meters(self.depth_arr)
+
+        if not rgb:
+            return d
+
+        return self.rgb, d

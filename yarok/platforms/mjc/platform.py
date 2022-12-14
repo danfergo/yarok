@@ -4,12 +4,15 @@ import mujoco
 from mujoco import MjModel
 
 from yarok.core.components_manager import ComponentsManager
+from yarok.core.injector import Injector
+
 from ..mjc.interface import InterfaceMJC
 from ..mjc.viewer import ViewerMJC
 from yarok.core.config_block import ConfigBlock
 from yarok.core.platform import Platform
 import numpy as np
 import cv2
+import inspect
 
 INTERFACES_COMPONENTS_NAMES = [
     'sensor',
@@ -56,9 +59,33 @@ class PlatformMJC(Platform):
         [interf.on_init() for _, interf in interfaces_mjc.items()]
 
         # ** {'config': config['interfaces'][c['name_path']] or ConfigBlock({})}
+        def init_interface(n):
+            interface_cls = self.manager.config(n)['interface_mjc']
 
-        self.interfaces = {n: self.manager.config(n)['interface_mjc'](interfaces_mjc[n])
-                           for n, interface_mjc in interfaces_mjc.items()}
+            # backwards compatible:
+            if not hasattr(self.manager.config(n)['interface_mjc'], '__data__'):
+                print('[deprecated] interfaces should be annotated with the @interface decorator')
+                return interface_cls(interfaces_mjc[n])
+
+            class_members = {t[0]: t[1] for t in inspect.getmembers(interface_cls)}
+            init_members = {t[0]: t[1] for t in inspect.getmembers(class_members['__init__'])}
+            init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
+
+            interface_defaults = self.manager.config(n)['interface_mjc'].__data__['defaults']
+            config = ConfigBlock({})
+            config.defaults(interface_defaults)
+
+            providers = [
+                {'match_type': ConfigBlock, 'value': config},
+                # {'match_all': true, 'factory': lambda name, type: self.platform.manager.get_by_name(self.component_ref, name)['instance']}
+                {'match_type': InterfaceMJC, 'value': interfaces_mjc[n]}
+            ]
+
+            injector = Injector(self, providers=providers)
+
+            return interface_cls(**injector.get_all(init_annotations))
+
+        self.interfaces = {n: init_interface(n) for n, interface_mjc in interfaces_mjc.items()}
 
         self.init_components(self.interfaces)
 

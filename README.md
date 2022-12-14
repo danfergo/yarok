@@ -353,3 +353,13 @@ A Plugin, can be any Python class that implements a ``step()`` method.
 - On MuJoCo 1.0 (pre deepmind aquisition), the following
   export ``export LD_PRELOAD='/usr/lib/x86_64-linux-gnu/libGLEW.so' `` was used to successfully have the simulation
   running with the GPU.
+
+
+## Todo list
+- Calibrate UR5 and Robotiq gripper actuators
+- Verify schema/that configs for interfaces can be passed on
+- Update PlatformHW to use @interface defaults
+- Review documentation README.md
+- Generalize Injectors to use providers list 
+- Add "for" block
+- Add support for mujoco include

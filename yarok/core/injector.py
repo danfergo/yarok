@@ -1,27 +1,32 @@
 class Injector:
 
-    def __init__(self, platform, component_ref, config=None):
+    def __init__(self, platform, component_ref=None, config=None, providers=None):
+        self.providers = providers if providers is not None else []
         self.platform = platform
         self.component_ref = component_ref
-        self.config = self.component_ref['config'] if config is None else config
+        self.config = self.component_ref['config'] if self.component_ref is not None and config is None else config
 
     def get(self, name_or_cls=None, cls=None):
         name = name_or_cls if isinstance(name_or_cls, str) else None
         injectable_cls = name_or_cls if not isinstance(name_or_cls, str) else cls
 
-        if injectable_cls is None:
+        if injectable_cls is None and self.component_ref:
             return self.platform.manager.get_by_name(self.component_ref, name)['instance']
         else:
             if isinstance(self.platform, injectable_cls):
                 return self.platform
             elif isinstance(self, injectable_cls):
                 return self
-            elif isinstance(self.component_ref['config'], injectable_cls):
+            elif isinstance(self.config, injectable_cls):
                 return self.config
-            elif self.component_ref['name_path'] == '/' and name == 'world':
+            elif self.component_ref and self.component_ref['name_path'] == '/' and name == 'world':
                 return self.component_ref['instance']
-            elif name is not None:
+            elif name is not None and self.component_ref:
                 return self.platform.manager.get_by_name(self.component_ref, name)['instance']
+
+        for provider in self.providers:
+            if 'match_type' in provider and provider['match_type'] == injectable_cls:
+                return provider['value']
 
         return None
 
