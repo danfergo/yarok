@@ -38,9 +38,9 @@ Try other worlds
 
 | Name                                                           | Description  |
 |:---------------------------------------------------------------|---|
-| [EmptyWorld](yarok/comm/components/worlds/empty_world.py)      | Just an empty world. Can be used as the base for other worlds.
-| [DigitWorld](yarok/comm/components/worlds/digit_world.py)      | A Pick and Place with a UR5 arm, Robotiq gripper, and the DIGIT tactile sensor
-| [GraspRopeWorld](yarok/comm/components/worlds/geltip_world.py) | 
+| [EmptyWorld](yarok/comm/worlds/empty_world.py)      | Just an empty world. Can be used as the base for other worlds.
+| [DigitWorld](yarok/comm/worlds/digit_world.py)      | A Pick and Place with a UR5 arm, Robotiq gripper, and the DIGIT tactile sensor
+| [GraspRopeWorld](yarok/comm/worlds/geltip_world.py) | 
 
 ##### Other projects using Yarok
 If you are using yarok, let us know.
