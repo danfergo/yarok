@@ -36,11 +36,11 @@ run an example world and behaviour,
 
 Try other worlds
 
-| Name                                                           | Description  |
-|:---------------------------------------------------------------|---|
-| [EmptyWorld](yarok/comm/worlds/empty_world.py)      | Just an empty world. Can be used as the base for other worlds.
-| [DigitWorld](yarok/comm/worlds/digit_world.py)      | A Pick and Place with a UR5 arm, Robotiq gripper, and the DIGIT tactile sensor
-| [GraspRopeWorld](yarok/comm/worlds/geltip_world.py) | 
+| Name                                             | Description  |
+|:-------------------------------------------------|---|
+| [EmptyWorld](yarok/comm/worlds/empty_world.py)   | Just an empty world. Can be used as the base for other worlds.
+| [DigitWorld](yarok/comm/worlds/digit_world.py)   | A Pick and Place with a UR5 arm, Robotiq gripper, and the DIGIT tactile sensor
+| [GelTipWorld](yarok/comm/worlds/geltip_world.py) | A UR5 arm and Robotiq 2 finger gripper, equipped with GelTip sensors, pulling a rope
 
 ##### Other projects using Yarok
 If you are using yarok, let us know.
