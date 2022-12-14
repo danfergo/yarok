@@ -129,7 +129,7 @@ class PhongRender:
 
     def internal_shadow(self, elastomer_depth):
         elastomer_depth_inv = self.max_depth - elastomer_depth
-        elastomer_depth_inv = np.interp(elastomer_depth_inv, (0, self.elastomer_thickness), (0.0, 0.5))
+        elastomer_depth_inv = np.interp(elastomer_depth_inv, (0, self.elastomer_thickness), (0.0, 1.0))
         return elastomer_depth_inv
 
 
