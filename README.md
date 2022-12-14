@@ -80,7 +80,7 @@ You can import these components into your world/component as follows. (see the e
 | Name                                                           | Description  |
 |:---------------------------------------------------------------|---|
 | [Cam](yarok/comm/components/cam/cam.py)                        | Wraps the py_mujoco and OpenCV APIs for handling generic cameras.
-| [Digit](yarok/comm/components/cam/cam.py)                      | DIGIT optical tactile sensor, [Lambeta et al.](https://digit.ml/). Simulation model and assets ported from [Zhao et. al](https://github.com/Rancho-zhao/Digit_PhongSim).                                      
+| [Digit](yarok/comm/components/digit/digit.py)                  | DIGIT optical tactile sensor, [Lambeta et al.](https://digit.ml/). Simulation model and assets ported from [Zhao et. al](https://github.com/Rancho-zhao/Digit_PhongSim).                                      
 | [GelSight2014](yarok/comm/components/gelsight/gelsight2014.py) | (WIP) tactile sensor as proposed in [Rui Li et al.](http://persci.mit.edu/publications/rui-iros2014) and the simulation model proposed in [Gomes et al.](https://danfergo.github.io/gelsight-simulation/)
 | [GelTip](yarok/comm/components/geltip/geltip.py)               | (WIP) Finger-shaped tactile sensor, [Gomes et al.](https://danfergo.github.io/geltip/), and simulation model [GelTip Simulation](https://github.com/danfergo/geltip-simulation)
 
