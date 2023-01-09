@@ -88,6 +88,9 @@ class InterfaceMJC:
         mujoco.mjr_render(viewport, self.scn, context)
         mujoco.mjr_readPixels(self.rgb, self.depth_arr, viewport, context)
 
+        self.rgb = np.fliplr(self.rgb)
+        self.depth_arr = np.fliplr(self.depth_arr)
+
         if not depth:
             return self.rgb
         d = self.depth_arr if depth == 'raw' else self.depthimg2Meters(self.depth_arr)

@@ -5,13 +5,15 @@ from yarok import Platform, PlatformMJC, PlatformHW, component, ConfigBlock, Inj
     template="""
         <mujoco>
             <!-- possibly the physics solver -->
-            <option timestep="0.01" solver="Newton" iterations="30" tolerance="1e-10" jacobian="auto" cone="pyramidal"/>
-            <compiler angle="radian"/>
+            <compiler angle="radian"  autolimits="true"/>
+ <!--             <option impratio="10"/>
 
+            <option timestep="0.01" solver="Newton" iterations="30" tolerance="1e-10" jacobian="auto" cone="pyramidal"/> -->
+            <size nconmax="10000" njmax="10000"/>
             <visual>
                 <!-- important for tactile sensors, to ensure the its camera frustum captures the close-up elastomer -->
                 <map znear="0.001" zfar="100"/>
-                <quality shadowsize="2048"/>
+<!--                <quality shadowsize="2048"/> -->
             </visual>
 
             <asset>
@@ -24,7 +26,7 @@ from yarok import Platform, PlatformMJC, PlatformHW, component, ConfigBlock, Inj
             <worldbody>
                 <light directional="true" diffuse="1.0 1.0 1.0" specular="0.1 0.1 0.1" pos="0 0 5.0" dir="0 0 -1"/>
                 <body name="floor">
-                    <geom name="ground" type="plane" size="0 0 1" pos="0 0 0" quat="1 0 0 0" material="matplane" condim="1"/>
+                    <geom name="ground" type="plane" size="0 0 1" pos="0 0 0" quat="1 0 0 0" material="matplane"/>
                 </body>
             </worldbody>
 

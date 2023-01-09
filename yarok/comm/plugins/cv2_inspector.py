@@ -26,7 +26,7 @@ class Cv2Inspector:
     def __init__(self, platform: Platform):
         self.components_manager = platform.manager
         self.platform = platform
-        self.probe_interval = 1. / 5
+        self.probe_interval = 0.5
         self.next_probe_ts = time.time() + self.probe_interval
 
     def inspect_component(self, comp):
@@ -44,7 +44,8 @@ class Cv2Inspector:
                                     (0, 255, 0),
                                     1,
                                     cv2.LINE_AA)
-                cv2.imshow(comp['name'] + '/' + name, frame)
+                frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                cv2.imshow(comp['name'] + '/' + name, frame_bgr)
                 cv2.setWindowTitle(comp['name'] + '/' + name, comp['name'] + '/' + name)
 
     def step(self):
@@ -55,7 +56,8 @@ class Cv2Inspector:
             [
                 self.inspect_component(comp)
                 for component_id, comp in self.components_manager.components.items()
-                if self.components_manager.config(comp)['probe'] is not None
+                if 'probe' in self.components_manager.config(comp)
             ]
+            self.next_probe_ts = time.time() + self.probe_interval
 
             cv2.waitKey(1)

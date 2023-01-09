@@ -19,11 +19,7 @@ class ViewerMJC:
         The MuJoCo viewer wrapper.
 
         The step method can be called to update the viewer.
-        i.e.,
-            in the case of VIEW mode
-                - is calls mjViewer.render() - the default MuJoCo renderer
-            in case of RUN mode
-                - it grabs a frame from the default camera and displays
+
     """
 
     def __init__(self, platform, config: ConfigBlock):
@@ -39,7 +35,6 @@ class ViewerMJC:
 
 
         self.next_probe_ts = time.time() + self.config['refresh_rate']
-        self.mode = config['mode']
 
         self.viewer = mujoco_viewer.MujocoViewer(self.model,
                                                  self.data,

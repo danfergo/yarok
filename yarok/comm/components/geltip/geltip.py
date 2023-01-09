@@ -1,118 +1,79 @@
-from yarok import ConfigBlock, component
-from yarok.platforms.mjc.interface import InterfaceMJC
+from yarok import component, interface, ConfigBlock
+from yarok.platforms.mjc import InterfaceMJC
 
 import numpy as np
 import cv2
 import os
+import open3d as o3d
 
 import math
 
 from time import time
 
-
-def get_camera_matrix(img_size, fov_deg=70):
-    img_width, img_height = img_size
-
-    fov = math.radians(fov_deg)
-    f = img_height / (2 * math.tan(fov / 2))
-    cx = (img_width - 1) / 2
-    cy = (img_height - 1) / 2
-
-    return o3d.camera.PinholeCameraIntrinsic(img_width, img_height, f, f, cx, cy)
+from .sim_model.model import SimulationModel
+from .sim_model.utils.camera import circle_mask
 
 
-def get_cloud_from_depth(cam_matrix, depth):
-    o3d_depth = o3d.geometry.Image(depth)
-    o3d_cloud = o3d.geometry.PointCloud.create_from_depth_image(o3d_depth, cam_matrix)
-    return o3d_cloud
-
-
+@interface(
+    defaults={
+        'frame_size': (320, 240),
+    }
+)
 class GelTipInterfaceMJC:
 
-    def __init__(self, interface: InterfaceMJC):
-        self.interface = interface
-        self.raw_depth = np.zeros((480, 640))
-        self.tactile_rgb = np.zeros((480, 640))
-        self.last_update = 0
+    def __init__(self, interface_mjc: InterfaceMJC, config: ConfigBlock):
+        self.interface = interface_mjc
+        self.frame_size = config['frame_size']
+        self.mask = circle_mask(self.frame_size)
+        bkg_zeros = np.zeros(self.frame_size[::-1] + (3,), dtype=np.float32)
 
-        base = os.path.dirname(__file__) + '/simulation_model'
+        __location__ = os.path.realpath(
+            os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        assets_path = os.path.join(__location__, './sim_model/assets/')
 
-        cloud_size = (160, 120)
-        method = 'geo'
-        prefix = str(cloud_size[0]) + 'x' + str(cloud_size[1])
+        elastic_deformation = True
+        cloud, geodesic_light_fields = SimulationModel.load_assets(
+            assets_path,
+            (160, 120),
+            self.frame_size,
+            'geodesic',
+            3)
 
-        return
-
-        cloud = np.load(base + '/fields/' + prefix + '_ref_cloud.npy')
-        cloud = cloud.reshape((cloud_size[1], cloud_size[0], 3))
-        cloud = cv2.resize(cloud, (640, 480))
-
-        normals = np.load(base + '/fields/' + prefix + '_surface_normals.npy')
-        normals = normals.reshape((cloud_size[1], cloud_size[0], 3))
-        normals = cv2.resize(normals, (640, 480))
-
-        light_fields = [
-            normalize_vectors(
-                cv2.GaussianBlur(
-                    cv2.resize(np.load(base + '/fields/' + method + '_' + prefix + '_field_ ' + str(l) + '.npy')
-                               .astype(np.float64), (640, 480))
-                    , (15, 15), cv2.BORDER_DEFAULT)
-            )
-            for l in range(3)
+        light_coeffs = [
+            {'color': [196, 94, 255], 'id': 0.5, 'is': 0.1},  # red # [108, 82, 255]
+            {'color': [154, 144, 255], 'id': 0.5, 'is': 0.1},  # green # [255, 130, 115]
+            {'color': [104, 175, 255], 'id': 0.5, 'is': 0.1},  # blue  # [120, 255, 153]
         ]
 
-        self.approach = SimulationApproach(**{
-            'light_sources': [
-                {'field': light_fields[0], 'color': [108, 82, 255], 'kd': 0.1, 'ks': 0.9},
-                {'field': light_fields[1], 'color': [255, 130, 115], 'kd': 0.1, 'ks': 0.9},
-                {'field': light_fields[2], 'color': [120, 255, 153], 'kd': 0.1, 'ks': 0.9},
-            ],
+        light_fiels = [{'field': geodesic_light_fields[l], **light_coeffs[l]} for l in range(3)]
+
+        self.model = SimulationModel(**{
+            'ia': 0.8,
+            'light_sources': light_fiels,
+            'background_depth': cv2.resize(np.load(assets_path + 'bkg.npy'), self.frame_size),
             'cloud_map': cloud,
-            'normals': normals,
-            'background_img': cv2.imread(base + '/bkg.jpg'),
-            'ka': 0.8,
-            'px2m_ratio': 5.4347826087e-05,
+            'background_img': bkg_zeros,  # bkg_rgb if use_bkg_rgb else
             'elastomer_thickness': 0.004,
             'min_depth': 0.026,
-            'texture_sigma': 0.000002
+            'texture_sigma': 0.000005,
+            'elastic_deformation': elastic_deformation
         })
+        self.depth = np.zeros(self.frame_size, np.float32)
 
-        self.cam_matrix = get_camera_matrix((640, 480))
+        self.last_update = 0
 
-    def read(self, shape=(480, 640)):
+    def read(self):
         t = time()
-        if self.last_update > t - 0.1:
-            return self.raw_depth
-        rgb, depth = self.interface.read_camera('camera', shape, depth=True, rgb=True)
-
+        if self.last_update > t - 1.0:
+            return self.tactile
         self.last_update = t
-        self.raw_rgb = rgb
-        self.raw_depth = depth
-
-        # print(self.raw_depth.shape)
-        # self.raw_depth = frame[1]
-        return self.raw_depth
-
-        o3d_cloud = get_cloud_from_depth(self.cam_matrix, self.raw_depth * 10)
-        o3d_cloud_raw_pts = np.asarray(o3d_cloud.points)
-        # print(o3d_cloud_raw_pts.shape)
-        # print(self.raw_depth.shape, o3d_cloud_raw_pts.shape[0], 480 * 640)
-
-        # print('--> ', o3d_cloud_raw_pts.shape[0])
-        if o3d_cloud_raw_pts.shape[0] != 480 * 640:
-            print('SKIP!')
-            return self.raw_depth
-
-        depth = o3d_cloud_raw_pts.reshape((480, 640, 3)) / 10
-
-        # if o3d_cloud_raw_pts.shape[0] == 480 * 640:
-        self.tactile_rgb = self.approach.generate(depth)
-
-        # self.tactile_rgb = frame[0]
-        return self.tactile_rgb
+        shape = self.frame_size[1], self.frame_size[0]
+        self.depth = self.interface.read_camera('camera', shape, depth=True, rgb=False)
+        self.tactile = self.model.generate(self.depth).astype(np.uint8)
+        return self.tactile
 
     def read_depth(self):
-        return self.raw_depth
+        return self.depth
 
 
 class GelTipInterfaceHW:
@@ -138,12 +99,15 @@ class GelTipInterfaceHW:
     defaults={
         'interface_mjc': GelTipInterfaceMJC,
         'interface_hw': GelTipInterfaceHW,
-        'probe': lambda c: {'camera': c.read()}
+        'probe': lambda c: {'camera': c.read()},
+        # template configs,
+        'label_color': '255 0 0'
     },
     # language=xml
     template="""
         <mujoco>
             <asset>
+                <material name="glass_material" rgba="1 1 1 0.1"/>
                 <material name="white_elastomer" rgba="1 1 1 1"/>
                 <material name="black_plastic" rgba=".3 .3 .3 1"/>
                 
@@ -154,11 +118,14 @@ class GelTipInterfaceHW:
                 <mesh name="geltip_mount" file="meshes/mount.stl" scale="0.001 0.001 0.001"/>
                 
                 <!-- the glass -->
-                <mesh name="geltip_glass" file="meshes/glass_long.stl" scale="0.001 0.001 0.001"/>
-                <!-- the outter elastomer -->
-                <mesh name="geltip_elastomer" file="meshes/elastomer_long.stl" scale="0.00115 0.00115 0.00105"/>  
+                <mesh name="geltip_glass" file="meshes/glass_long.stl" scale="0.00099 0.00099 0.00099"/>
+                
+                <!-- the outter elastomer, for visual purposes -->
+                <mesh name="geltip_elastomer" file="meshes/elastomer_long.stl" scale="0.0011 0.0011 0.0011"/>  
+                
                 <!-- inverted mesh, for limiting the depth map-->
-                <mesh name="geltip_elastomer_inv" file="meshes/elastomer_long_inv.stl" scale="0.00115 0.00115 0.00105"/>
+                <!-- changing this mesh changes the depth maps -->
+                <mesh name="geltip_elastomer_inv" file="meshes/elastomer_long_inv.stl" scale="0.00105 0.00105 0.00105"/>
         
             </asset>
             <worldbody>
@@ -174,19 +141,24 @@ class GelTipInterfaceHW:
                     <camera name="camera" pos="0 0 0.01" zaxis="0 0 -1" fovy="70"/>
                     <body>
                     
-                        <!-- mesh, to serve as the glass and detect collisions -->
-                        <geom density="0.1" type="mesh" 
+                       <!-- mesh, to serve as the glass and detect collisions -->
+                             <!-- solimp="1.0 1.2 0.001 0.5 2" 
+                              solref="0.02 1"-->
+                       <geom density="0.1" type="mesh" 
                               mesh="geltip_glass" 
-                              solimp="1.0 1.2 0.001 0.5 2" 
-                              solref="0.02 1"
-                              material="white_elastomer" />
+                              pos="0.0 0.0 -0.003"
+                              friction="1 0.05 0.01" 
+                              solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"
+                              material="glass_material" /> 
                               
-                        <!-- inverted, mmesh, for limiting the depth-map -->      
-                        <geom density="0.1" 
-                              type="mesh" 
+                       <!-- inverted, mesh, for limiting the depth-map -->
+                       <!-- changing this geom/mesh changes the depth maps -->
+                       <!-- 32 for contype and conaffinity disable collisions -->     
+                       <geom  type="mesh" 
                               mesh="geltip_elastomer_inv" 
-                              contype="-1" 
-                              conaffinity="-1"
+                              contype="32"  
+                              conaffinity="32" 
+                              pos="0.0 0.0 -0.005"
                               material="white_elastomer" />
                        
                        <!-- white elastomer, for visual purposes -->
@@ -194,9 +166,10 @@ class GelTipInterfaceHW:
                               type="mesh" 
                               mesh="geltip_elastomer" 
                               friction="1 0.05 0.01" 
-                              contype="-1" 
-                              conaffinity="-1"
-                              material="white_elastomer"/> 
+                              contype="32" 
+                              conaffinity="32" 
+                              pos="0.0 0.0 -0.007"
+                              material="white_elastomer"/>
                     </body>
         
                 </body>

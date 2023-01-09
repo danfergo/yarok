@@ -19,14 +19,16 @@ __location__ = os.path.realpath(
 @interface(
     defaults={
         'light_sources': [
-            {'position': [-0.866, 0.5, 0.25], 'color': (108, 82, 255), 'kd': 0.1, 'ks': 0.4},
+            {'position': [-0.866, 0.5, 0.25], 'color': (255, 82, 108), 'kd': 0.1, 'ks': 0.4},
             # red, bottom (108, 82, 255) kd 0.6
-            {'position': [0.866, 0.5, 0.25], 'color': (120, 255, 153), 'kd': 0.1, 'ks': 0.4},
+            {'position': [0.866, 0.5, 0.25], 'color': (153, 255, 120), 'kd': 0.1, 'ks': 0.4},
             # green, left (120, 255, 153)
-            {'position': [0, -1, 0.25], 'color': (255, 130, 115), 'kd': 0.3, 'ks': 0.4},
+            {'position': [0, -1, 0.25], 'color': (115, 130, 255), 'kd': 0.3, 'ks': 0.4},
             # blue, left (255, 130, 115)
         ],
-        'background_img': np.load(os.path.join(__location__, './assets/gel/digit_bg.npy')),
+        'background_img': cv2.cvtColor(
+            np.load(os.path.join(__location__, './assets/gel/digit_bg.npy')),
+            cv2.COLOR_BGR2RGB),
         'ka': 1.0,
         'texture_sigma': 0.00001,
         'px2m_ratio': 5.4347826087e-05,
@@ -52,7 +54,7 @@ class DigitInterfaceMJC:
 
     def read(self, shape=(320, 240)):
         t = time()
-        if self.last_update > t - 0.2:
+        if self.last_update > t - 1.0:
             return self.tactile
         self.last_update = t
         self.depth = self.interface.read_camera('digit0:camera', shape, depth='raw', rgb=False)

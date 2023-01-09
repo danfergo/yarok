@@ -4,13 +4,13 @@
     <option timestep="0.002">
         <flag warmstart="enable"></flag>
     </option>
-
+<!--
     <default>
         <light castshadow="false" diffuse="1 1 1"/>
         <camera fovy="60"/>
         <motor ctrllimited="true" ctrlrange="-0.04 0.04"/>
         <joint range="-1.5708 1.5708"/>
-    </default>
+    </default> -->
 
     <visual>
         <rgba connect="1 0.2 1 1" joint="0.2 0.6 0.8 1"/>
@@ -79,10 +79,10 @@
             <!-- <joint name="digit:joint" type="hinge" damping="0.01"></joint> -->
             <!--Front and Back-->
             <geom name="digit0:back" type="mesh" euler="3.1416 0 1.5708" pos="0.028 0.015 0.036" material="black_resin"
-                  mesh="digit_back" mass="0.05" contype="32" conaffinity="32" friction="1 0.05 0.01"
+                  mesh="digit_back" mass="0.05" friction="1 0.05 0.01"
                   solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
             <geom name="digit0:adapter" type="mesh" euler="0 -1.5708 3.1416" pos="0.05 0.0097 0.0326" material="silver"
-                  mesh="digit_adapter" mass="0.05" contype="32" conaffinity="32" friction="1 0.05 0.01"
+                  mesh="digit_adapter" mass="0.05" friction="1 0.05 0.01"
                   solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
             <!--Glass Cover-->
             <geom name="digit0:glass" type="mesh" material="transparent_glass" mesh="digit_glass" mass="0.005"
@@ -96,7 +96,8 @@
             <!-- <geom name="digit0:elastCover" type="mesh" mesh="digit_gel_cover" pos="0.025 -0.01 0.031" euler="0 0 1.5708" contype="0" conaffinity="0" material="silver"
                     friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/> -->
             <geom name="digit0:elastCover" type="mesh" mesh="digit_curve" pos="0.024 -0.0083 0.0305" euler="0 0 1.5708"
-                  contype="0" conaffinity="0" material="silver"
+                  contype="0" conaffinity="0"
+                  material="silver"
                   friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
 
             <!--Gel Camera-->

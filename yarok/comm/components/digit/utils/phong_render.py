@@ -148,7 +148,6 @@ class PhongRender:
 
         kernel = gkern2(self.kernel_size, self.sigma)
         deformation = protrusion_depth
-
         deformation2 = protrusion_depth
         kernel2 = gkern2(52, 9)
 
@@ -161,12 +160,12 @@ class PhongRender:
             r = np.max(protrusion_depth) / np.max(deformation2_) if np.max(deformation2_) > 0 else 1
             deformation2 = np.maximum(r * deformation2_, protrusion_depth)
 
-        deformation_v1 = self.apply_elastic_deformation_v1(protrusion_depth, not_in_touch, in_touch)
+        # deformation_v1 = self.apply_elastic_deformation_v1(protrusion_depth, not_in_touch, in_touch)
 
-        for i in range(self.t):
-            deformation_ = cv2.filter2D(deformation2, -1, kernel)
-            r = np.max(protrusion_depth) / np.max(deformation_) if np.max(deformation_) > 0 else 1
-            deformation2 = np.maximum(r * deformation_, protrusion_depth)
+        # for i in range(self.t):
+        #     deformation_ = cv2.filter2D(deformation2, -1, kernel)
+        #     r = np.max(protrusion_depth) / np.max(deformation_) if np.max(deformation_) > 0 else 1
+        #     deformation2 = np.maximum(r * deformation_, protrusion_depth)
 
 
         deformation_x = 2.0 * deformation - deformation2

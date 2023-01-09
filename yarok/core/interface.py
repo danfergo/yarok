@@ -1,10 +1,3 @@
-import re
-import os
-import sys
-import pathlib
-import inspect
-
-
 def interface(**kwargs):
     def _(c):
         if not hasattr(c, '__data__'):

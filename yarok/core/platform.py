@@ -16,7 +16,6 @@ class Platform(ABC):
         self.config = env_config['platform'] if 'platform' in env_config else ConfigBlock({})
 
         self.injector = Injector(self, self.manager.components_tree)
-
         self.plugins = [self.init_plugin(pl_tuple) for pl_tuple in env_config['plugins']]
 
     def init_plugin(self, plugin_tuple):
@@ -46,11 +45,12 @@ class Platform(ABC):
             },
             'environments': {
                 'sim': {
-                    'platform': PlatformMJC,
+                    'platform': {
+                        'class': PlatformMJC
+                    },
                     'components': {
 
-                    },
-                    'plugins': []
+                    }
                 }
             }
         })
@@ -68,7 +68,6 @@ class Platform(ABC):
 
         platform_class = env_config['platform']['class'] \
             if env_config.is_config_block('platform') else env_config['platform']
-
         return platform_class(manager, env_config, behaviour)
 
     @abstractmethod

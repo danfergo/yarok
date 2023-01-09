@@ -356,9 +356,11 @@ A Plugin, can be any Python class that implements a ``step()`` method.
 
 
 ## Todo list
-- Calibrate UR5 and Robotiq gripper actuators
+- Handle MuJoCo defaults / classes  
+- Handle compiler options
 - Verify schema/that configs for interfaces can be passed on
 - Update PlatformHW to use @interface defaults
+- add probe to interface decorator
 - Review documentation README.md
 - Generalize Injectors to use providers list 
 - Add "for" block
