@@ -1,4 +1,6 @@
 yarok/comm/components/ur5e/ikfastpy
+yarok/comm/components/ur5e/ikfastpy/**
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
