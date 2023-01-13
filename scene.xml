@@ -1,13 +1,10 @@
 <mujoco>
             
             <default>
-                <default class="cup_side">
-                    <geom type="box" material="#1:glass" size="0.0025 0.0220 0.0500" pos="0.05 0.0 0.0500" euler="0 0.05 0" />
-                </default>
-                <default class="cup_bottom">
-                    <geom type="box" material="#1:glass" size="0.0220 0.0500 0.0025" />
-                </default>
-            <default class="visual">
+        
+        
+
+        <default class="visual">
             <geom type="mesh" contype="0" conaffinity="0" group="2" />
         </default>
         <default class="collision">
@@ -63,8 +60,8 @@
       </default>
     </default>
   </default>
-            
-            <compiler angle="radian" autolimits="true" />
+
+    <compiler angle="radian" autolimits="true" />
  
             <size nconmax="10000" njmax="10000" />
             <visual>
@@ -77,9 +74,6 @@
                 
                 <texture name="#1:#1:texplane" type="2d" builtin="checker" rgb1=".2 .3 .4" rgb2=".1 0.15 0.2" width="512" height="512" mark="cross" markrgb=".8 .8 .8" />    
                 <material name="#1:#1:matplane" reflectance="0.3" texture="#1:#1:texplane" texrepeat="1 1" texuniform="true" />
-            <material name="#1:glass" rgba="1 1 1 0.1" />
-                <material name="#1:red" rgba=".8 .2 .1 1" />
-                <material name="#1:green" rgba=".2 .8 .1 1" />
             <material name="arm#2:black" specular="0.5" shininess="0.25" rgba="0.033 0.033 0.033 1" />
         <material name="arm#2:jointgray" specular="0.5" shininess="0.25" rgba="0.278 0.278 0.278 1" />
         <material name="arm#2:linkgray" specular="0.5" shininess="0.25" rgba="0.82 0.82 0.82 1" />
@@ -166,66 +160,19 @@
                 <body name="#1:#1:floor">
                     <geom name="#1:#1:ground" type="plane" size="0 0 1" pos="0 0 0" quat="1 0 0 0" material="#1:#1:matplane" />
                 </body>
-            <body pos="-0.135 -0.52 0.22">
-                    <body zaxis="1 1 1">
-                        <composite type="particle" count="4 4 4" spacing="0.0125">
-                            <geom size="0.008" material="#1:red" />
-                        </composite>
-                    </body>
-                </body>   
-                
-                <body pos="-0.135 -0.52 0.27">
-             
-                    <body>
-                        <composite type="particle" count="4 4 4" spacing="0.02">
-                            <geom size="0.008" material="#1:green" mass="0.0001" />
-                        </composite>
-                    </body>
-                </body>               
-             
-             <body pos="-0.135 -0.48 0.016">
-                <geom type="box" size="0.2 0.2 0.14" />
-             </body>
-
-                 <body pos="-0.135 -0.52 0.165">
-                    <freejoint /> 
-                    <body euler="0 0 0.0">
-                        <geom class="cup_side" />
-                    </body>
-                    <body euler="0 0 0.78539816339">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 1.57079632679">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 2.35619449019">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 3.14159265359">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 0.78539816339">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 3.92699081699">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 4.71238898038">
-                        <geom class="cup_side" />
-                    </body> 
-                    <body euler="0 0 5.49778714378">
-                        <geom class="cup_side" />
-                    </body> 
-                    
-                    <body>
-                        <geom class="cup_bottom" euler="0 0 -0.78539816339" />
-                        <geom class="cup_bottom" euler="0 0 0" />
-                        <geom class="cup_bottom" euler="0 0 0.78539816339" />
-                        <geom class="cup_bottom" euler="0 0 1.57079632679" />
-                    </body> 
+            <body pos="0 0 0.2">
+                    <freejoint />
+                    <geom type="cylinder" size="0.02 0.11" pos="-0.135 -0.48 0.11" mass="0.0001" zaxis="1 0 0" />
                 </body>
-                
-
+                <body>
+                    <geom type="box" size="0.02 0.1 0.09" pos="-0.2 -0.48 0.09" />
+                    <geom type="box" size="0.02 0.1 0.09" pos="-0.05 -0.48 0.09" />
+                    <geom type="box" size="0.01 0.01 0.13" pos="-0.18 -0.44 0.13" />
+                    <geom type="box" size="0.01 0.01 0.13" pos="-0.18 -0.52 0.13" />
+                    <geom type="box" size="0.01 0.01 0.13" pos="-0.07 -0.52 0.13" />
+                    <geom type="box" size="0.01 0.01 0.13" pos="-0.07 -0.44 0.13" />
+                </body>
+            
                 <body name="arm#2:base" quat="1 0 0 1">
             <inertial mass="4.0" pos="0 0 0" diaginertia="0.00443333156 0.00443333156 0.0072" />
             <geom mesh="arm#2:base_0" material="arm#2:black" class="visual" />

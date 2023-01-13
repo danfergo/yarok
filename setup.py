@@ -11,7 +11,9 @@ setup(
     name='yarok',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    packages=find_packages(),
+    packages=find_packages(
+        exclude=["yarok/comm/components/ur5e/ikfastpy"]
+    ),
     include_package_data=True,
     version='0.0.17',
     description='YAROK - Yet another robot framework',
