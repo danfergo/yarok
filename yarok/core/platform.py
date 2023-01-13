@@ -42,6 +42,9 @@ class Platform(ABC):
         config.defaults({
             'defaults': {
                 'environment': 'sim',
+                'behaviour': {
+
+                }
             },
             'environments': {
                 'sim': {
@@ -119,7 +122,8 @@ class Platform(ABC):
             init_members = {t[0]: t[1] for t in inspect.getmembers(class_members['__init__'])}
             init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
 
-            bh_injector = Injector(self, self.manager.components_tree)
+            bh_config = self.env_config['behaviour']
+            bh_injector = Injector(self, self.manager.components_tree, config=bh_config)
             bh = self.behaviour(**bh_injector.get_all(init_annotations))
             if hasattr(bh, 'on_start'):
                 bh.on_start()

@@ -4,7 +4,8 @@ class Injector:
         self.providers = providers if providers is not None else []
         self.platform = platform
         self.component_ref = component_ref
-        self.config = self.component_ref['config'] if self.component_ref is not None and config is None else config
+        self.config = config if config is not None else self.component_ref[
+            'config'] if self.component_ref is not None else None
 
     def get(self, name_or_cls=None, cls=None):
         name = name_or_cls if isinstance(name_or_cls, str) else None
