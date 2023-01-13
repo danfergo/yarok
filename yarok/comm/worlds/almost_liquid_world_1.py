@@ -6,12 +6,8 @@ from yarok.comm.components.ur5e.ur5e import UR5e
 from yarok.comm.components.digit.digit import Digit
 
 from yarok.comm.plugins.cv2_inspector import Cv2Inspector
-from yarok.comm.plugins.cv2_waitkey import Cv2WaitKey
 
 from math import pi
-
-import cv2
-
 
 @component(
     extends=EmptyWorld,
@@ -135,8 +131,8 @@ class AlmostLiquidPouringBehaviour:
         self.pl = pl
 
     def on_update(self):
-        self.pl.wait_seconds(60)
-        print('------------------------------------------------------------------------------------------->')
+        # self.pl.wait_seconds(60)
+        # print('------------------------------------------------------------------------------------------->')
 
 
         q = [0, -pi / 2, -pi / 2 + pi / 4, 0, pi / 2, pi / 2]

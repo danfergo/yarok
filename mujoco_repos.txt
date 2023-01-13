@@ -1,1 +1,0 @@
-https://github.com/wangcongrobot/dual_ur5_husky_mujoco

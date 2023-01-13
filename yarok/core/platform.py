@@ -44,7 +44,10 @@ class Platform(ABC):
                 'environment': 'sim',
                 'behaviour': {
 
-                }
+                },
+                'plugins': [
+
+                ]
             },
             'environments': {
                 'sim': {

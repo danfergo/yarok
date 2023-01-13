@@ -7,8 +7,6 @@ import time
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
-from .ur5_kinematics import HTrans, invKine
-
 
 def sae(q1, q2):
     return sum([abs(q1[i] - q2[i]) for i in range(6)])

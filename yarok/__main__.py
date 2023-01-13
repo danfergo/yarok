@@ -61,7 +61,7 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print('version 0.0.15')
+        print('version 0.0.16')
     else:
         run({
             'world': load(args.component),

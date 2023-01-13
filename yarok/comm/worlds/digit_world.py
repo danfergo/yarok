@@ -1,7 +1,7 @@
 from yarok import Platform, PlatformMJC, PlatformHW, component, ConfigBlock, Injector
 
 from yarok.comm.worlds.empty_world import EmptyWorld
-from yarok.comm.components.robotiq_2f85.Robotiq2f85 import Robotiq2f85
+from yarok.comm.components.robotiq_2f85.robotiq_2f85 import Robotiq2f85
 from yarok.comm.components.ur5.ur5 import UR5
 from yarok.comm.components.ur5e.ur5e import UR5e
 from yarok.comm.components.digit.digit import Digit
@@ -47,14 +47,14 @@ import cv2
                 left: xyaxes="0 -1 0 0 0 -1" pos="-0.0765 0.161 0.092"
             -->
                 <ur5e name='arm'> 
-                   <robotiq_2f85.py name="gripper" parent="ee_link"> 
+                   <robotiq-2f85 name="gripper" parent="ee_link"> 
                         <body xyaxes='0 0 -1 1 0 0' pos="-0.001  0.009 .064" parent='right_tip'>
                             <digit name="digit1" />
                         </body>
                         <body xyaxes='0 0 -1 1 0 0' pos="-0.001  0.009 .064" parent='left_tip'>
                             <digit name="digit2" />
                         </body>
-                    </robotiq_2f85.py> 
+                    </robotiq-2f85> 
                  </ur5e> 
             </worldbody>        
         </mujoco>

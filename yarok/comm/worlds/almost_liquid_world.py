@@ -125,7 +125,7 @@ class AlmostLiquidWorld:
 class AlmostLiquidPouringBehaviour:
 
     def __init__(self, pl: Platform, injector: Injector):
-        self.arm: UR5 = injector.get('arm')
+        self.arm: UR5e = injector.get('arm')
         self.gripper = injector.get('gripper')
         self.pl = pl
 
@@ -168,9 +168,9 @@ conf = {
                 'right_tip': False,
             }
         },
-        'plugins': [
-            (Cv2Inspector, {})
-        ]
+        # 'plugins': [
+        #     (Cv2Inspector, {})
+        # ]
     },
     'environments': {
         'sim': {
