@@ -15,7 +15,7 @@ setup(
         exclude=["yarok/comm/components/ur5e/ikfastpy"]
     ),
     include_package_data=True,
-    version='0.0.17',
+    version='0.0.18',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
