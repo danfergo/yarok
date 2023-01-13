@@ -12,7 +12,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(
-        exclude=["yarok/comm/components/ur5e/ikfastpy"]
+        # exclude=["yarok/comm", "yarok/comm.*"]
     ),
     include_package_data=True,
     version='0.0.18',
