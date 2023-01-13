@@ -15,7 +15,7 @@ setup(
         # exclude=["yarok/comm", "yarok/comm.*"]
     ),
     include_package_data=True,
-    version='0.0.18',
+    version='0.0.19',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
