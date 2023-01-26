@@ -1,22 +1,23 @@
 # YAROK - Yet another robot framework
 
-A **Python** library for interfacing with sensors and actuators, and composing robots and robotic environments.
+[![PyPI Version](https://img.shields.io/pypi/v/yarok.svg?color=blue)](https://pypi.python.org/pypi/yarok)
+
+Is a **Python** library for interfacing with sensors and actuators, and composing robots and robotic environments.
 Aimed for quick prototyping, learning, researching, etc. Simulation first (MuJoCo).
 
-Key features of **Yarok**:
+It can be seen as a minimalistic alternative to ROS: Python-centric, OS independent and single process.
 
-* Modularity through components.
-* Environment independent control logic.
+It is centered around modularity for reusability: 
+each component is self-contained with a template, an environment-independent 
+controller Python class and interfaces for handling each environmnent (MuJoCo or real). 
+It supports nesting an existing component onto another e.g. a gripper onto a robot arm. 
 
-With **Yarok** you can:
 
-* Write drivers for sensors and actuators with different interfaces for simulation or real world.
-* Compose robots and robotic environments through components.
-* Use components from others and/or share your own.
-* Write Python scripts for controlling such robots.
-* Run experiments in simulation and/or real robots interchangeably.
+
+Checkout the **[Demo](https://github.com/danfergo/yarok-demo)** repository, and start coding your next project.
 
 ## Install
+
 
 ```
     pip3 install yarok
@@ -25,6 +26,8 @@ With **Yarok** you can:
 run an example world and behaviour,
 
 ``` 
+    # test.py
+    
     from yarok import Platform
     from yarok.examples.grasp_rope_world import GraspRopeWorld, GraspRopeWorld
     
@@ -32,6 +35,10 @@ run an example world and behaviour,
         'world': GraspRopeWorld,
         'behaviour': GraspRoleBehaviour
     }).run()
+```
+
+```
+  python -m test
 ```
 
 Try other worlds
@@ -56,7 +63,6 @@ If you are using yarok, let us know.
 
 Example components are included in this package to reduce any friction with getting started with the library, if
 you would like us to include/reference yours let us know.
-You can also find more examples in the "Projects using Yarok" repositories.
 
 You can import these components into your world/component as follows. (see the example worlds)
 
@@ -99,9 +105,11 @@ You can import these components into your world/component as follows. (see the e
 
 ```
 from yarok import component, Injector
+from yarok.comm.worlds.empty_world import EmptyWorld
 
 @component(
     tag='some-component',
+    extends=EmptyWorld,
     components=[
         OneSubcomponent,
         AnotherSubcomponent
@@ -146,6 +154,7 @@ What to know when coding a **Component decorator** and **class**
 | Name        | Description                                                                                                                                                                                                                                                                                                                                                                                    |
 |-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | tag         | To be used as the tag in the .xml templates.                                                                                                                                                                                                                                                                                                                        |
+| extends     | References the parent template. This component body is appended to the "parent" body.
 | Components  | References to the classes/components to be used as subcomponents in this component.
 | Defaults    | Configs that can be referenced in the template using ``${conf}``, and can be (re)configured when launching the platform. 
 | Interfaces  | MuJoCo ``interface_mjc`` or Real Hardware ``interface_hw`` interfaces, used to interface with the real/sim platforms. Before instantiating the component, Yarok merges the appropriate environment interface with the component class, effectively becoming one. Thus, the component class should declare the interface(s) common public methods (api) as empty/pass for static typing.
@@ -153,6 +162,7 @@ What to know when coding a **Component decorator** and **class**
 | Class       | The Python class used to interface with the component programmatically.                                                                                                                                                                                                                                                                                                                        |
 | Constructor | You can "request" the reference of the instantiated (sub)components in the template, by adding ` name: ComponentClass ` to the constructor arguments. You can also request the injector ``injector: Injector`` and then call ``injector.get(name)``.
 
+### Using a component within another component
 ```
 <another-subcomponent name='subsub' parent='body-in-parent'/>
 ```
@@ -163,10 +173,41 @@ What to know when coding a **Component decorator** and **class**
 | @name    | The name/id of the component instance.
 | @parent  | (optional) When sub-nesting (check example) you can use the @parent attribute to reference the parent body in the parent component, wherein the subcomponent will be nested. Make sure that a body with such name existis in the parent component.
 
+### Eval
+
+```
+  <geom pos="
+            ${0.5 + 0.082*x if z % 2 == 0 else 0.58} 
+            ${0.48 if z % 2 == 0 else 0.4 + 0.082*x}
+            ${0.061*z}" />
+```
+You can use `${}` to have python expressions evaluated within the template. 
+You can use variables here, from the config/defaults or the tree context.
+### If block and attribute
+```
+<if the='x == 4'>
+  ...
+</for>
+
+<geom if="y == 2" .../>
+```
+The if block / attribute. You can use variables here.
+
+### For loop
+```
+<for each='range(n_elements)' as='i'>
+  ...
+</for>
+```
+``each`` a python expression that returns an iterable, you can use variables here. 
+``as`` is the name of the iterable. You'll be able to use it in the evals/ifs/fors down the chain.
+[usage example](yarok/comm/toys/tumble_tower/tumble_tower.py#L25)  
+
 ⚠ All paths for meshes are relative to the component directory.
 
 Here we described the extensions on top of the MJCF language, for the full reference check
 the [MuJoCo XML](https://mujoco.readthedocs.io/en/latest/XMLreference.html).
+
 
 ### Interface with Sim or Real sensors or actuators
 
@@ -253,8 +294,9 @@ conf = {
             '/sub': {
                 'confy': 'valuey'
             },
-            '/geltip2': {
-                'label_color': '0.0 1.0 0.0'
+            # and so forth.. (subsub inside sub)
+            '/sub/subsub': {
+                'confz': 'valuez'
             }
         },
         # pluggins that can be called at every step of the control loop
@@ -267,8 +309,7 @@ conf = {
     'environments': {
         'sim': {
             'platform': {
-                'class': PlatformMJC,
-                'mode': 'view'
+                'class': PlatformMJC
             },
             'behaviour': {
                 'where_iam': 'In Simulation !'
@@ -356,12 +397,11 @@ A Plugin, can be any Python class that implements a ``step()`` method.
 
 
 ## Todo list
-- Handle MuJoCo defaults / classes  
+- Update PlatformHW to use @interface defaults
+- Add probe to interface decorator
+- Behaviour to each component vs single behaviour. (Problems with platform.wait?) 
+- Handle/rename MuJoCo defaults / classes  
 - Handle compiler options
 - Verify schema/that configs for interfaces can be passed on
-- Update PlatformHW to use @interface defaults
-- add probe to interface decorator
 - Review documentation README.md
-- Generalize Injectors to use providers list 
-- Add "for" block
-- Add support for mujoco include
+- Add support for mujoco's include

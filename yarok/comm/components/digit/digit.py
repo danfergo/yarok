@@ -28,7 +28,6 @@ __location__ = os.path.realpath(
         ],
         'background_img': cv2.cvtColor(
             cv2.imread(os.path.join(__location__, './assets/gel/digit_bg.png')),
-            # np.load(),
             cv2.COLOR_BGR2RGB),
         'ka': 1.0,
         'texture_sigma': 0.00001,

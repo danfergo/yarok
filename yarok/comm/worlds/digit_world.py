@@ -1,17 +1,13 @@
-from yarok import Platform, PlatformMJC, PlatformHW, component, ConfigBlock, Injector
+from yarok import Platform, PlatformMJC, component, Injector
 
 from yarok.comm.worlds.empty_world import EmptyWorld
 from yarok.comm.components.robotiq_2f85.robotiq_2f85 import Robotiq2f85
-from yarok.comm.components.ur5.ur5 import UR5
 from yarok.comm.components.ur5e.ur5e import UR5e
 from yarok.comm.components.digit.digit import Digit
 
 from yarok.comm.plugins.cv2_inspector import Cv2Inspector
-from yarok.comm.plugins.cv2_waitkey import Cv2WaitKey
 
 from math import pi
-
-import cv2
 
 
 @component(
@@ -98,14 +94,13 @@ class DigitPickAndPlace:
         # self.pl.wait(lambda: self.gripper.is_at(200))
         self.pl.wait_seconds(3)
 
-        q = [0, -pi / 2, - pi / 2 - pi / 10 + pi / 5, -pi / 2 + pi / 10 - pi / 5, pi / 2 , pi / 2]
+        q = [0, -pi / 2, - pi / 2 - pi / 10 + pi / 5, -pi / 2 + pi / 10 - pi / 5, pi / 2, pi / 2]
         self.arm.move_q(q)
         self.pl.wait(lambda: self.arm.is_at(q))
 
         q = [0, -pi / 2, -pi / 2 + pi / 4, 0, pi / 2, pi / 2]
         self.arm.move_q(q)
         self.pl.wait(lambda: self.arm.is_at(q))
-
 
         # self.gripper.move(0.5)
 

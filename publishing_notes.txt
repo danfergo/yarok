@@ -1,4 +1,5 @@
 rm -rf build && rm -rf dist
+rm -rf yarok.comm.components.ur5e.ikfastpy
 
 # yarok.__main__ __VERSION__ string to  0.0.X
 git add *

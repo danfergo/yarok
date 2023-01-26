@@ -205,6 +205,11 @@ class ComponentsManager:
             for element in elements:
                 tag = element.tag
 
+                try:
+                    self.parse_attributes(element, config or comp['config'])
+                except Exception as e:
+                    raise Exception(e.args[0] + ',\nfor ' + str(comp))
+
                 has_if = 'if' in element.attrib
                 if has_if:
                     condition_str = element.attrib['if']
@@ -267,8 +272,8 @@ class ComponentsManager:
                         'children': []
                     }
                     config = self.components_config[sub_component['name_path']] \
-                            if sub_component['name_path'] in self.components_config \
-                            else ConfigBlock({})
+                        if sub_component['name_path'] in self.components_config \
+                        else ConfigBlock({})
                     config.defaults(sub_component['class'].__data__['defaults'])
                     sub_component['config'] = config
 
@@ -318,11 +323,6 @@ class ComponentsManager:
                 else:
                     walk_tree_recur(element, list(element), comp, config)
 
-                try:
-                    self.parse_attributes(element, config or comp['config'])
-                except Exception as e:
-                    raise Exception(e.args[0] + ',\nfor ' + str(comp))
-
                 for attr in RENAME_KEYS_ATTRS_NAMES:
                     if attr in element.attrib:
                         element.attrib[attr] = parent_component['id'] + ':' + element.attrib[attr]
@@ -345,7 +345,8 @@ class ComponentsManager:
         # replaces all {expression} -> eval(expressio, None, config) in the attr.
 
         wrap = {'txt': attr, 'offset': 0}
-        regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|=|%)*)\})"
+        # todo improve this regex to pass python code
+        regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
 
         def replace(match, o):
             txt = o['txt']

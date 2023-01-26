@@ -11,7 +11,9 @@ class Injector:
         name = name_or_cls if isinstance(name_or_cls, str) else None
         injectable_cls = name_or_cls if not isinstance(name_or_cls, str) else cls
 
-        if injectable_cls is None and self.component_ref:
+        if injectable_cls is None and self.component_ref and self.component_ref['name_path'] == '/' and name == 'world':
+            return self.component_ref['instance']
+        elif injectable_cls is None and self.component_ref:
             return self.platform.manager.get_by_name(self.component_ref, name)['instance']
         else:
             if isinstance(self.platform, injectable_cls):
@@ -20,8 +22,6 @@ class Injector:
                 return self
             elif isinstance(self.config, injectable_cls):
                 return self.config
-            elif self.component_ref and self.component_ref['name_path'] == '/' and name == 'world':
-                return self.component_ref['instance']
             elif name is not None and self.component_ref:
                 return self.platform.manager.get_by_name(self.component_ref, name)['instance']
 

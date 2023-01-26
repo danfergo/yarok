@@ -1,3 +1,20 @@
+import os
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+import subprocess
+
+if not os.path.exists(os.path.join(__location__, 'ikfastpy')):
+    print('To enable UR5e pose control, Andy Zeng ikfastpy is going to be cloned and installed.')
+    print('https://github.com/andyzeng/ikfastpy')
+    print('Insert [Y] to continue... else aborts')
+    if input('') == 'Y':
+        process = subprocess.Popen([os.path.join(__location__, 'install_ikfast.sh'), __location__])
+        process.wait()
+        print('Done. Finished installing ikfastpy.')
+    else:
+        exit(-1)
+
 from yarok import Platform, PlatformMJC, PlatformHW, component, interface, ConfigBlock, Injector
 
 from yarok.platforms.mjc import InterfaceMJC
@@ -6,6 +23,7 @@ from math import pi, sin, cos
 import time
 import numpy as np
 from scipy.spatial.transform import Rotation as R
+from .ikfastpy import ikfastpy
 
 
 def sae(q1, q2):
@@ -251,7 +269,6 @@ class UR5eInterfaceMJC:
         # return False
 
 
-from .ikfastpy import ikfastpy
 
 
 @component(
