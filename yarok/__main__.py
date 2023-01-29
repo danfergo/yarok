@@ -4,13 +4,11 @@ from os import path
 import os
 import argparse
 
-from .__init__ import run
+from .__init__ import run, __VERSION__
 
 import importlib.util
 import sys
 from enum import Enum
-
-__VERSION__ = '0.0.14'
 
 
 # adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
@@ -61,7 +59,7 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print('version 0.0.20')
+        print('Version ' + __VERSION__)
     else:
         run({
             'world': load(args.component),
