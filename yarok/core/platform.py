@@ -145,8 +145,8 @@ class Platform(ABC):
             if self.plugins:
                 [(plugin() if callable(plugin) else plugin.step()) for plugin in self.plugins]
             if (fn is None) \
-                    or (isinstance(list, fn) and not any([not e() for e in fn])) \
-                    or fn():
+                    or (isinstance(fn, list) and not any([not e() for e in fn])) \
+                    or (callable(fn) and fn()):
                 break
             if cb is not None:
                 cb()
