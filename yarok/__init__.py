@@ -10,7 +10,7 @@ from yarok.platforms.mjc.platform import PlatformMJC
 from yarok.platforms.hw.platform import PlatformHW
 
 __PLATFORM__ = None
-__VERSION__ = '0.0.24'
+__VERSION__ = '0.0.25'
 
 
 def wait(fn=None, cb=None):
