@@ -30,7 +30,12 @@ class Cv2Inspector:
         self.next_probe_ts = time.time() + self.probe_interval
 
     def inspect_component(self, comp):
-        data = self.components_manager.config(comp)['probe'](comp['instance'])
+        probe = self.components_manager.config(comp)['probe']
+
+        if not callable(probe):
+            return
+
+        data = probe(comp['instance'])
 
         for name, datum in data.items():
             if type(datum) == np.ndarray:

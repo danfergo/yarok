@@ -345,8 +345,10 @@ class ComponentsManager:
         # replaces all {expression} -> eval(expressio, None, config) in the attr.
 
         wrap = {'txt': attr, 'offset': 0}
+
         # todo improve this regex to pass python code
-        regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
+        # regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
+        regex = "\$\{([^}]+)\}"  # proposed by ChatGPT
 
         def replace(match, o):
             txt = o['txt']
