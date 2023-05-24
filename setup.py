@@ -15,6 +15,7 @@ setup(
     packages=find_packages(
         # exclude=["yarok/comm", "yarok/comm.*"]
     ),
+    include_package_data=True,
     version=__VERSION__,
     description='YAROK - Yet another robot framework',
     author='danfergo',
