@@ -348,7 +348,7 @@ class ComponentsManager:
 
         # todo improve this regex to pass python code
         # regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
-        regex = "\$\{([^}]+)\}"  # proposed by ChatGPT
+        regex = "(\$\{([^}]+)\})"  # proposed by ChatGPT
 
         def replace(match, o):
             txt = o['txt']
