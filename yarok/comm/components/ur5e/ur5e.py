@@ -1,19 +1,44 @@
 import os
+
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 import subprocess
 
-if not os.path.exists(os.path.join(__location__, 'ikfastpy')):
+try:
+    from .ikfastpy import ikfastpy
+except (ModuleNotFoundError, ImportError) as e:
     print('To enable UR5e pose control, Andy Zeng ikfastpy is going to be cloned and installed.')
-    print('https://github.com/andyzeng/ikfastpy')
-    print('Insert [Y] to continue... else aborts')
-    if input('') == 'Y':
-        process = subprocess.Popen([os.path.join(__location__, 'install_ikfast.sh'), __location__])
-        process.wait()
-        print('Done. Finished installing ikfastpy.')
-    else:
+    print('Insert [Y] to continue... else abort.')
+    if input('') != 'Y':
+        abort(-1)
+
+    try:
+        import Cython
+    except ModuleNotFoundError as e:
+        print('We need to install Cython. Using pip or pip3?')
+        builder = ('' + input('')).lower().strip()
+        if builder != 'pip' and builder != 'pip3':
+            exit(-1)
+        os.system(f'{builder} install Cython')
+
+    print('Cloning https://github.com/andyzeng/ikfastpy...')
+    os.system(f'cd {__location__} && \
+                  rm -rf ikfastpy && \
+                  git clone https://github.com/andyzeng/ikfastpy.git')
+
+    print('Build with python or python3?')
+    builder = ('' + input('')).lower().strip()
+    if builder != 'python' and builder != 'python3':
         exit(-1)
+
+    os.system(f'cd {__location__}/ikfastpy && \
+                  {builder} setup.py build_ext --inplace')
+
+    print('Done. Finished installing ikfastpy.')
+
+    # import it again, it should be fine now.
+    from .ikfastpy import ikfastpy
 
 from yarok import Platform, PlatformMJC, PlatformHW, component, interface, ConfigBlock, Injector
 
@@ -23,7 +48,6 @@ from math import pi, sin, cos
 import time
 import numpy as np
 from scipy.spatial.transform import Rotation as R
-from .ikfastpy import ikfastpy
 
 
 def sae(q1, q2):
@@ -267,8 +291,6 @@ class UR5eInterfaceMJC:
         # self.last_query_position = at
         #
         # return False
-
-
 
 
 @component(
