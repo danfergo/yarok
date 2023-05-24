@@ -15,6 +15,8 @@ setup(
     packages=find_packages(
         # exclude=["yarok/comm", "yarok/comm.*"]
     ),
+    # I'm not sure about the real impact of this flag,
+    # but the file extensions to be included are defined in MANIFEST.in
     include_package_data=True,
     version=__VERSION__,
     description='YAROK - Yet another robot framework',
