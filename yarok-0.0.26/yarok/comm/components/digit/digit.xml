@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mujoco>
+    <compiler angle="radian" coordinate="local" meshdir="../stls"></compiler>
+    <option timestep="0.002">
+        <flag warmstart="enable"></flag>
+    </option>
+<!--
+    <default>
+        <light castshadow="false" diffuse="1 1 1"/>
+        <camera fovy="60"/>
+        <motor ctrllimited="true" ctrlrange="-0.04 0.04"/>
+        <joint range="-1.5708 1.5708"/>
+    </default> -->
+
+    <visual>
+        <rgba connect="1 0.2 1 1" joint="0.2 0.6 0.8 1"/>
+        <map fogstart="3" fogend="5"/>
+        <quality shadowsize="2048"/>
+    </visual>
+    <option gravity="0 0 0" iterations="100"/>
+    <!--
+    <custom>
+        <numeric name="N_GRIPPER_JOINTS" data="0"/>
+    </custom> -->
+
+    <size nconmax="2000" njmax="10000" nstack="500000"/>
+    <!-- Camera settings -->
+    <visual>
+        <!-- allows the camera to fit into smaller spaces without clipping through -->
+        <map znear="0.001" zfar="1000"/>
+    </visual>
+
+    <asset>
+        <!--DIGIT models-->
+        <mesh name="digit_adapter" file="assets/stls/digit_adapter.STL" scale="0.001 0.001 0.001"/>
+        <mesh name="digit_back" file="assets/stls/digit_back.STL" scale="0.001 0.001 0.001"/>
+        <mesh name="digit_glass" file="assets/stls/digit_glass.STL" scale="0.001 0.001 0.003"/>
+        <mesh name="digit_gel" file="assets/stls/digit_glass.STL" scale="0.001 0.001 0.0009"/>
+        <mesh name="digit_gel_cover" file="assets/stls/digit_gel.STL" scale="0.0012 0.0011 0.001"/>
+        <mesh name="digit_curve" file="assets/stls/digit_curve_0_5.STL" scale=".001 .001 .001"/>
+
+        <material name="black_resin" rgba="0.1 0.1 0.1 1"/>
+        <material name="gray_elastomer" rgba="0.8 0.8 0.8 1"/>
+        <material name="transparent_glass" rgba="0.9 0.95 1 0.7"/>
+
+
+        <material name="silver" specular="1" shininess="0.5" reflectance="1" emission="0.25" rgba="0.82 0.82 0.82 1"/>
+        <material name="grey" specular="1" shininess="0.5" reflectance="1" emission="0.1" rgba="0.5 0.5 0.5 1"/>
+        <material name="blue" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.678 0.847 0.902 1"/>
+        <material name="black" specular="1" shininess="0.5" reflectance="1" emission="0" rgba="0.2 0.2 0.2 1"/>
+        <material name="floor_mat" specular="0" shininess="0.5" reflectance="0" rgba="0.2 0.2 0.2 1"/>
+        <material name="table_mat" specular="0" shininess="0.5" reflectance="0" rgba="0.93 0.93 0.93 1"/>
+        <material name="block_mat" specular="0" shininess="0.5" reflectance="0" rgba="0.2 0.2 0.2 1"/>
+        <material name="puck_mat" specular="0" shininess="0.5" reflectance="0" rgba="0.2 0.2 0.2 1"/>
+    </asset>
+
+    <worldbody>
+        <!--
+        <geom name="floor0" pos="0 0 0" size="0.85 0.7 1" type="plane" contype="32" conaffinity="32" condim="3"
+              material="floor_mat"></geom>
+        <body name="floor0" pos="0 0 0">
+            <site name="target0" pos="0 0 0.5" size="0.02 0.02 0.02" rgba="1 0 0 0.0" type="sphere"></site>
+        </body>
+
+        <include file="digit_sensor.xml"></include>
+
+        <light directional="true" ambient="0.2 0.2 0.2" diffuse="0.8 0.8 0.8" specular="0.3 0.3 0.3" castshadow="true"
+               pos="0 0 4" dir="0 0 -1" name="light0"></light> -->
+        <!-- <body mocap="true" name="mocap" pos="0 0 0.1">
+            <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.2" size="0.002 0.002 0.002" type="box"/>
+            <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.2" size=".1 0.002 0.002" type="box"/>
+            <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.2" size="0.002 .1 0.002" type="box"/>
+            <geom conaffinity="0" contype="0" pos="0 0 0" rgba="0 0.5 0 0.2" size="0.002 0.002 .1" type="box"/>
+        </body> -->
+
+        <!-- Digit Sensor -->
+        <body name="digit_sensor" pos="0 0 0">
+<!--            <site name="digit:site" pos="0.012 0 0.035" rgba="1 0 0 .1" size="0.02 0.02 0.02"/>-->
+            <!-- <joint name="digit:joint" type="hinge" damping="0.01"></joint> -->
+            <!--Front and Back-->
+            <geom name="digit0:back" type="mesh" euler="3.1416 0 1.5708" pos="0.028 0.015 0.036" material="black_resin"
+                  mesh="digit_back" mass="0.05" friction="1 0.05 0.01"
+                  solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+            <geom name="digit0:adapter" type="mesh" euler="0 -1.5708 3.1416" pos="0.05 0.0097 0.0326" material="silver"
+                  mesh="digit_adapter" mass="0.05" friction="1 0.05 0.01"
+                  solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+            <!--Glass Cover-->
+            <geom name="digit0:glass" type="mesh" material="transparent_glass" mesh="digit_glass" mass="0.005"
+                  contype="0" conaffinity="0" pos="0.024 -0.0085 0.017" euler="0 0 1.5708"/>
+
+            <!--Elastomer-->
+            <geom name="digit0:elastomer" type="mesh" mesh="digit_gel" pos="0.024 -0.0085 0.032" euler="0 0 1.5708"
+                  contype="0" conaffinity="0" rgba="0.9 0.95 1 0.0"/>
+
+            <!--Elastomer Cover-->
+            <!-- <geom name="digit0:elastCover" type="mesh" mesh="digit_gel_cover" pos="0.025 -0.01 0.031" euler="0 0 1.5708" contype="0" conaffinity="0" material="silver"
+                    friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/> -->
+            <geom name="digit0:elastCover" type="mesh" mesh="digit_curve" pos="0.024 -0.0083 0.0305" euler="0 0 1.5708"
+                  contype="0" conaffinity="0"
+                  material="silver"
+                  friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+
+            <!--Gel Camera-->
+            <camera name="digit0:camera" mode="fixed" pos="0.0129 0.0014 0.008" euler="0 3.14159 1.5708" fovy="30"/>
+            <!-- <site name="digit0:pos" type="sphere" pos="0.0129 0.0014 0.008" rgba="1 0 1 1" size=".008 .008 .008"/> -->
+
+            <!-- Friction placeholder -->
+            <geom name="digit0:friction" type="box" size="0.013 0.013 0.00001" euler="0 0 0" pos="0.012 0.001 0.0362"
+                  contype="32" conaffinity="32" rgba="0 0 1 0"
+                  friction="1 0.05 0.01" solimp="1.1 1.2 0.001 0.5 2" solref="0.02 1"/>
+
+        </body>
+    </worldbody>
+
+</mujoco>

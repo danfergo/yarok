@@ -1,0 +1,4 @@
+global-include **/*.xml
+global-include **/*.stl
+global-include **/*.obj
+global-include **/*.png

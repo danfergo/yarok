@@ -1,0 +1,118 @@
+<mujoco>
+    <asset>
+        <mesh name="fdm_printer_bottom_frame" file="meshes/bottom_frame.stl" scale="0.0011 0.0011 0.0011"/>
+        <mesh name="fdm_printer_side1_frame" file="meshes/side1_frame.stl" scale="0.0011 0.0011 0.0011"/>
+        <mesh name="fdm_printer_side2_frame" file="meshes/side2_frame.stl" scale="0.0011 0.0011 0.0011"/>
+
+
+        <mesh name="fdm_printer_bed" file="meshes/bed2.stl" scale="0.0011 0.0011 0.0011"/>
+        <mesh name="fdm_printer_x_axis" file="meshes/x_axis.stl" scale="0.0011 0.0011 0.0011"/>
+
+        <material name="black_metal" rgba=".2 .2 .2 1" specular="0.95"/>
+
+
+        <!--        &lt;!&ndash; mounts &ndash;&gt;-->
+        <!--        <mesh name="tiny_object_set_mount" file="mount_object.stl" scale="0.001 0.001 0.001"/>-->
+        <!--        <mesh name="geltip_printer_mount" file="geltip_printer_mount.stl" scale="0.001 0.001 0.001"/>-->
+
+
+        <!--        &lt;!&ndash; object set &ndash;&gt;-->
+        <!--        <mesh name="object_cone" file="object_set/cone.stl" scale="0.001 0.001 0.001"/>-->
+        <!--        <mesh name="object_cylinder_shell" file="object_set/cylinder_shell.stl" scale="0.001 0.001 0.001"/>-->
+
+    </asset>
+    <worldbody>
+        <body>
+
+            <!-- External frame -->
+            <body pos="0 0 0.09">
+                <geom type="mesh"
+                      mesh="fdm_printer_bottom_frame"
+                      material="black_metal"/>
+                <geom type="mesh"
+                      mesh="fdm_printer_side1_frame"
+                      material="black_metal"/>
+                <geom type="mesh"
+                      mesh="fdm_printer_side2_frame"
+                      material="black_metal"/>
+                <geom type="mesh"
+                      mesh="fdm_printer_x_axis"
+                      material="black_metal"/>
+            </body>
+
+            <!-- Z-AXIS: horizontal metal bar -->
+            <body name="zaxis_body" pos="0 -0.025 0.068">
+
+                <joint name="zaxis"
+                       type="slide"
+                       armature="10"
+                       frictionloss="100"
+                       axis="0 0 1"/>
+
+                <geom type="mesh"
+                      mesh="fdm_printer_x_axis"
+                      material="black_metal"
+                      fitscale="0.001"
+                      pos="0 0 -0.498"/>
+
+                <!-- x-axis -->
+                <body name="xaxis_body">
+                    <joint name="xaxis"
+                           type="slide"
+                           frictionloss="100"
+                           armature="10"
+                           axis="1 0 0"/>
+
+                    <!-- printer head-->
+                    <body pos="-0.002 0 0.05">
+                        <geom type="box"
+                              pos="0.001 0.01 0.005"
+                              size=".04 .002 .035"
+                              material="black_metal"/>
+                        <!--                        <geom type="box"-->
+                        <!--                              pos="-0.01 -0.014 -0.015"-->
+                        <!--                              size=".025 .018 .0125"-->
+                        <!--                              material="black_plastic"/>-->
+                    </body>
+                </body>
+            </body>
+
+            <body name="printer_bed" pos="0 0 0.08">
+                <joint name="yaxis"
+                       type="slide"
+                       armature="1"
+                       frictionloss="100"
+                       axis="0 -1 0"/>
+
+
+                <!-- area/size of the real printer bed -->
+                <!--<geom type="box"-->
+                <!--  name="fake_bed"-->
+                <!--  size="0.165 0.165 0.001"-->
+                <!--  pos="0.164 .164 -0.01"-->
+                <!--  rgba="0.1 .1 0 .5"/>-->
+
+                <geom type="mesh"
+                      mesh="fdm_printer_bed"
+                      material="black_metal"
+                      friction="0.4 0.4 0.8"/>
+
+                <!-- wooden board (base) -->
+                <!--                <geom type="box"-->
+                <!--                      size="0.1085 0.165 0.004"-->
+                <!--                      pos="0.19 0.165 0.004"-->
+                <!--                      material="mdf_wood"/>-->
+            </body>
+        </body>
+    </worldbody>
+    <actuator>
+        <position name="ax" gear="100" joint="xaxis" forcelimited="true" forcerange="-1.02 1.02"/>
+        <position name="ay" gear="100" joint="yaxis" forcelimited="true" forcerange="-0.2 0.2"/>
+        <position name="az" gear="100" joint="zaxis" forcelimited="true" forcerange="-0.55 0.55"/>
+    </actuator>
+    <sensor>
+        <actuatorpos name="x" actuator="ax"/>
+        <actuatorpos name="y" actuator="ay"/>
+        <actuatorpos name="z" actuator="az"/>
+    </sensor>
+</mujoco>
