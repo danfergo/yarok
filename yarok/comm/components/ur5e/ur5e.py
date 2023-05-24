@@ -110,6 +110,9 @@ class UR5eInterfaceMJC:
     def set_ws(self, ws):
         self.ws = ws
 
+    def set_speed(self, speed):
+        self.speed = speed
+
     def get_transformation_matrix(self, q):
         ee_pose = self.ur5_kin.forward(q)
         ee_pose = np.asarray(ee_pose).reshape(3, 4)
@@ -327,6 +330,9 @@ class UR5e:
         pass
 
     def set_ws(self, ws):
+        pass
+
+    def set_speed(self, speed):
         pass
 
 
