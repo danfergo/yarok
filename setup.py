@@ -30,6 +30,7 @@ setup(
     classifiers=[],
     install_requires=[
         'mujoco',
-        'mujoco-python-viewer'
+        'mujoco-python-viewer',
+        'pyyaml' # mujoco viewer requires pyyaml .. just in case anyway.
     ]
 )
