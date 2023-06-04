@@ -41,7 +41,7 @@ class PlatformMJC(Platform):
 
     def __init__(self, manager: ComponentsManager, config: ConfigBlock, behaviour):
         super(PlatformMJC, self).__init__(manager, config, behaviour)
-
+        self.config = config
         self.model = MjModel.from_xml_string(tostring(manager.xml_tree, encoding="unicode"))
         self.data = mujoco.MjData(self.model)
 
@@ -59,12 +59,17 @@ class PlatformMJC(Platform):
         [interf.on_init() for _, interf in interfaces_mjc.items()]
 
         # ** {'config': config['interfaces'][c['name_path']] or ConfigBlock({})}
-        self.interfaces = {n: self.init_interface(n, config['interfaces'][c['name_path']] or ConfigBlock({}))
+        self.interfaces = {n: self.init_interface(interfaces_mjc, n, c)
                            for n, c in interfaces_mjc.items()}
 
         self.init_components(self.interfaces)
 
-    def init_interface(self, n, conf):
+    def init_interface(self, interfaces_mjc, n, c):
+        runtime_conf = ConfigBlock(
+            self.config['interfaces'][c['name_path']] if
+            'interfaces' in self.config and c['name_path'] in self.config['interfaces']
+            else {})
+
         interface_cls = self.manager.config(n)['interface_mjc']
 
         # backwards compatible:
@@ -77,7 +82,7 @@ class PlatformMJC(Platform):
         init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
 
         interface_defaults = self.manager.config(n)['interface_mjc'].__data__['defaults']
-        config = ConfigBlock(conf)
+        config = ConfigBlock(runtime_conf)
         config.defaults(interface_defaults)
 
         providers = [

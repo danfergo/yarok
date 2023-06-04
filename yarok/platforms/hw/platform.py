@@ -17,7 +17,7 @@ class PlatformHW(Platform):
     def __init__(self, manager: ComponentsManager, config: ConfigBlock, behaviour):
         super(PlatformHW, self).__init__(manager, config, behaviour)
         self.interfaces = {
-            id: self.init_interface(id, config['interfaces'][c['name_path']] or ConfigBlock({}))
+            id: self.init_interface(id, c)
             for id, c in self.manager.components.items()
             if 'interface_hw' in self.manager.config(id)}
 
@@ -26,8 +26,12 @@ class PlatformHW(Platform):
         while not self.interfaces_ready():
             self.step()
 
-    def init_interface(self, n, interface_runtime_config):
-        x = self.manager.config(n)
+    def init_interface(self, n, c):
+        runtime_conf = ConfigBlock(
+            self.config['interfaces'][c['name_path']] if
+            'interfaces' in self.config and c['name_path'] in self.config['interfaces']
+            else {})
+
         interface_cls = self.manager.config(n)['interface_hw']
 
         # backwards compatible:
@@ -40,7 +44,7 @@ class PlatformHW(Platform):
         init_annotations = init_members['__annotations__'] if '__annotations__' in init_members else {}
 
         interface_defaults = interface_cls.__data__['defaults']
-        config = ConfigBlock(interface_runtime_config)
+        config = ConfigBlock(runtime_conf)
         config.defaults(interface_defaults)
 
         providers = [

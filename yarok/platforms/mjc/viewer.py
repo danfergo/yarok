@@ -25,7 +25,7 @@ class ViewerMJC:
     def __init__(self, platform, config: ConfigBlock):
         self.model = platform.model
         self.data = platform.data
-        self.config = config
+        self.config = ConfigBlock(config)
         self.config.defaults({
             'refresh_rate': 1. / 33,
             'width': None,
