@@ -24,8 +24,8 @@ bumpversion --current-version $PREV_VERSION patch setup.py
 
 git add *
 git commit -m "updating version to "$VERSION
-#
-#python3 setup.py sdist bdist_wheel
-#twine upload dist/*
-#
+
+python3 setup.py sdist bdist_wheel
+twine upload dist/*
+
 #git push origin master
