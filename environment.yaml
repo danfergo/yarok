@@ -160,7 +160,6 @@ dependencies:
       - certifi==2022.6.15
       - charset-normalizer==2.1.1
       - cython==0.29.34
-      - download-stats==1.2.0
       - fake-useragent==0.1.11
       - h11==0.13.0
       - idna==3.3
