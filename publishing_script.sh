@@ -17,7 +17,7 @@ sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$VERSION+g" yarok/__init__.py
 conda env export | head -n -1 > environment.yaml
 
 git add *
-git commit -m "saving changes in preparation for version" $VERSION
+git commit -m "saving changes in preparation for version"$VERSION
 
 bumpversion --current-version $PREV_VERSION patch setup.py
 
