@@ -22,9 +22,8 @@ git commit -m "saving changes in preparation for version "$VERSION
 
 bumpversion --current-version $PREV_VERSION patch setup.py
 
-#
-#git add *
-#git commit -m "updating version to "$VERSION
+git add *
+git commit -m "updating version to "$VERSION
 #
 #python3 setup.py sdist bdist_wheel
 #twine upload dist/*
