@@ -271,11 +271,11 @@ class ComponentsManager:
                         'parent': parent_component,
                         'children': []
                     }
-                    config = self.components_config[sub_component['name_path']] \
+                    new_config = self.components_config[sub_component['name_path']] \
                         if sub_component['name_path'] in self.components_config \
                         else ConfigBlock({})
-                    config.defaults(sub_component['class'].__data__['defaults'])
-                    sub_component['config'] = config
+                    new_config.defaults(sub_component['class'].__data__['defaults'])
+                    sub_component['config'] = new_config
 
                     # appends the newly found sub component to the previous/parent component
                     parent_component['children'].append(sub_component)
@@ -303,22 +303,20 @@ class ComponentsManager:
                         if 'parent' in nested_element.attrib:
                             # print('PARENT', nested_element.attrib)
                             parentName = nested_element.attrib['parent']
-                            new_parent = parent.find(
+                            c_parent = parent.find(
                                 ".//body[@name='" + (sub_component['id'] + ':' + parentName) + "']")
-                            if new_parent is None:
+                            if c_parent is None:
                                 raise KeyError('Failed to nest ' +
                                                stringify_header(nested_element) + '>,' +
                                                ' body[name=' +
                                                parentName +
                                                '] not being found in ' + sub_component['tag'] + ' template.')
-                            # sub_tree.attrib['__base_component__'] = sub_tree['base_component']
                             nested_element.attrib.pop('parent')
-                            new_parent.append(nested_element)
-                            walk_tree_recur(new_parent, [nested_element], comp, config)
                         else:
-                            new_parent = parent  # sub_component_tree.find('worldbody')
-                            new_parent.append(nested_element)
-                            walk_tree_recur(new_parent, [nested_element], comp, config)
+                            c_parent = parent  # component worldbody
+
+                        c_parent.append(nested_element)
+                        walk_tree_recur(c_parent, [nested_element], comp, config)
 
                 else:
                     walk_tree_recur(element, list(element), comp, config)
@@ -348,7 +346,7 @@ class ComponentsManager:
 
         # todo improve this regex to pass python code
         # regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
-        regex = "(\$\{([^}]+)\})"  # proposed by ChatGPT
+        regex = "(\$\{([^}]+)\})"
 
         def replace(match, o):
             txt = o['txt']

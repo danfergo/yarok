@@ -388,20 +388,17 @@ Current plugins
 
 A Plugin, can be any Python class that implements a ``step()`` method.
 
-## Quick bugfixes
-
-- If having conflicts after installing **cv2**, comment import imageio
-- On MuJoCo 1.0 (pre deepmind aquisition), the following
-  export ``export LD_PRELOAD='/usr/lib/x86_64-linux-gnu/libGLEW.so' `` was used to successfully have the simulation
-  running with the GPU.
-
-
 ## Todo list
-- Update PlatformHW to use @interface defaults
 - Add probe to interface decorator
 - Behaviour to each component vs single behaviour. (Problems with platform.wait?) 
 - Handle/rename MuJoCo defaults / classes  
 - Handle compiler options
-- Verify schema/that configs for interfaces can be passed on
 - Review documentation README.md
-- Add support for mujoco's include
+- Add support for mujoco's native include
+
+
+## Quick bugfixes
+- If having conflicts after installing **cv2**, comment import imageio
+- On MuJoCo 1.0 (pre deepmind aquisition), the following
+  export ``export LD_PRELOAD='/usr/lib/x86_64-linux-gnu/libGLEW.so' `` was used to successfully have the simulation
+  running with the GPU.
