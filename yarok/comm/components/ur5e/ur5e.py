@@ -157,13 +157,16 @@ class UR5eInterfaceMJC:
         q = valid_joint_configs[closest_config_index]
         return q
 
-    def move_xyz_delta(self, xyz=None, xyz_angles=None):
+    def ik(self, xyz=None, xyz_angles=None):
         c_transformation_matrix = self.get_transformation_matrix(self.q)
         current_xyz, current_xyz_angles = self.get_pose_vectors(c_transformation_matrix)
         q_xyz = current_xyz if xyz is None else np.add(current_xyz, xyz)
         q_xyz_angles = current_xyz_angles if xyz_angles is None else np.add(current_xyz_angles, xyz_angles)
         transformation_matrix = self.compute_transformation_matrix(q_xyz, q_xyz_angles)
-        q = self.compute_ik(transformation_matrix)
+        return self.compute_ik(transformation_matrix)
+
+    def move_xyz_delta(self, xyz=None, xyz_angles=None):
+        q = self.ik(xyz, xyz_angles)
 
         if q is not None:
             return self.move_q(q)
@@ -321,6 +324,9 @@ class UR5e:
         pass
 
     def at(self):
+        pass
+
+    def ik(self, xyz=None, xyz_angles=None):
         pass
 
     def at_xyz(self):

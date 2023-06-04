@@ -96,6 +96,9 @@ class Robotiq2f85:
     def is_closed(self):
         pass
 
+    def at(self):
+        pass
+
     def is_at(self, a):
         pass
 
