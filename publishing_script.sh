@@ -17,6 +17,9 @@ sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$VERSION+g" yarok/__init__.py
 
 bumpversion --current-version $PREV_VERSION patch setup.py
 
+# re-export environment.yaml
+conda env export | head -n -1 > environment.yaml
+
 git add *
 git commit -m "updating version to "$VERSION
 
