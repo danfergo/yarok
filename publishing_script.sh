@@ -22,3 +22,5 @@ git commit -m "updating version to "$VERSION
 
 python3 setup.py sdist bdist_wheel
 twine upload dist/*
+
+git push origin master
