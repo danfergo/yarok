@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 
 # read the contents of your README file
 from os import path
-from yarok import __VERSION__
 
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
@@ -18,7 +17,7 @@ setup(
     # I'm not sure about the real impact of this flag,
     # but the file extensions to be included are defined in MANIFEST.in
     include_package_data=True,
-    version=__VERSION__,
+    version='0.0.28',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
