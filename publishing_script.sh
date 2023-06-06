@@ -18,12 +18,12 @@ sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$PREV_VERSION+g" setup.py
 # re-export environment.yaml
 conda env export | head -n -1 > environment.yaml
 
-git add *
+git add -A
 git commit -m "saving changes in preparation for version "$VERSION
 
 bumpversion --current-version $PREV_VERSION patch setup.py
 
-git add *
+git add -A
 git commit -m "updating version to "$VERSION
 
 python3 setup.py sdist bdist_wheel
