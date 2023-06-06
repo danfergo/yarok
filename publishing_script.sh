@@ -1,11 +1,13 @@
 #!/bin/bash
 
+rm MUJOCO_LOG.TXT
+rm scene.xml
 rm -rf yarok-*
 rm -rf build && rm -rf dist
 rm -rf yarok/comm/components/ur5e/ikfastpy
 
 
-PATCH=33
+PATCH=34
 VERSION="0.0."$PATCH
 
 PREV_PATCH=
