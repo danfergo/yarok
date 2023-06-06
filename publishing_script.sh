@@ -12,7 +12,7 @@ VERSION="0.0."$PATCH
 
 PREV_PATCH=
 PREV_VERSION="0.0."$(($PATCH - 1))
-echo "Publishing Yarok=="$PREV_VERSION
+echo "Publishing Yarok=="$VERSION
 
 sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$VERSION+g" yarok/__init__.py
 sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$PREV_VERSION+g" setup.py
