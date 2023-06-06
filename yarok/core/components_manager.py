@@ -31,7 +31,9 @@ EXTENDABLE_BLOCKS_NAMES = [
     'sensor',
     'actuator',
     'equality',
-    'contact'
+    'contact',
+    'compiler',
+    'option'
 ]
 
 
@@ -225,7 +227,7 @@ class ComponentsManager:
                 elif tag == 'for':
                     condition_str = element.attrib['each']
                     var_name = element.attrib['as'] if 'as' in element.attrib else None
-                    # print('--> ', parent_component['config'],  globals()['range'])
+
                     conf = config or parent_component['config']
                     elems = eval(condition_str, None, conf)
                     parent.remove(element)
@@ -271,11 +273,19 @@ class ComponentsManager:
                         'parent': parent_component,
                         'children': []
                     }
-                    new_config = self.components_config[sub_component['name_path']] \
+
+                    xml_attrs = {k: self.replace_all(v, config) for k, v in element.attrib.items()
+                                 if k != 'name' and k != 'parent'}
+
+                    new_config1 = ConfigBlock(xml_attrs)
+                    new_config1.defaults(sub_component['class'].__data__['defaults'])
+
+                    new_config2 = self.components_config[sub_component['name_path']] \
                         if sub_component['name_path'] in self.components_config \
                         else ConfigBlock({})
-                    new_config.defaults(sub_component['class'].__data__['defaults'])
-                    sub_component['config'] = new_config
+                    new_config2.defaults(new_config1)
+
+                    sub_component['config'] = new_config2
 
                     # appends the newly found sub component to the previous/parent component
                     parent_component['children'].append(sub_component)
@@ -334,40 +344,48 @@ class ComponentsManager:
             elem.attrib[k] = v
 
         try:
-            {set(k, self.replace_all(v, config)) for k, v in elem.attrib.items() if "$" in v}
+            {set(k, self.replace_all(v, config)) for k, v in elem.attrib.items() if "{" in v}
         except Exception as e:
             raise Exception(e.args[0] + ',\nfor ' + stringify_header(elem), e.args[1])
 
     def replace_all(self, attr, config):
-        # not very pretty code, but it works
-        # replaces all {expression} -> eval(expressio, None, config) in the attr.
+        if type(attr) != str:
+            return attr
 
-        wrap = {'txt': attr, 'offset': 0}
+        # not very pretty code, but it works
+        # replaces all {expression} -> eval(expression, None, config) in the attr.
 
         # todo improve this regex to pass python code
         # regex = "(\$\{(\w(\w|\+|\.|\*|\ |\\n|\'|[|]|=|/|%)*)\})"
-        regex = "(\$\{([^}]+)\})"
+        regex = "(\$?\{([^}]+)\})"
 
-        def replace(match, o):
-            txt = o['txt']
-            offset = o['offset']
+        local_vars = {'txt': attr, 'offset': 0}
+
+        def replace(match):
+            txt = local_vars['txt']
+            offset = local_vars['offset']
             k = match.group(2)
-            s = match.span(2)
+            wg = match.group(1)  # wrapped match (with ${} or {})
+            ws = match.span(1)
 
-            v = str(eval(k, None, config))
             # if k not in (config or {}):
             #     raise Exception(
             #         'Failed to find config "' + k + '" while parsing "' + attr + '".',
             #         k
             #     )
+            v = str(eval(k, None, config))
 
-            o['txt'] = txt[: offset + s[0] - 2] + v + txt[offset + s[1] + 1:]
-            # offset is used to compensate the "original" spans
-            # for the differences in the string before and after
-            o['offset'] += len(v) - (s[1] - s[0]) - 3
+            local_vars['txt'] = txt[: offset + ws[0]] + v + txt[offset + ws[1]:]
+            # offset is used to compensate the diff between the eval expression
+            # and the code expression with {...}
+            local_vars['offset'] += len(v) - (len(wg))
 
-        [replace(x, wrap) for x in re.finditer(regex, attr)]
-        return wrap['txt']
+        matches = list(re.finditer(regex, attr))
+        if len(matches) == 1 and (matches[0].span(1)[0] == 0) and (matches[0].span(1)[1] == len(attr)):
+            return eval(matches[0].group(2), None, config)
+        else:
+            [replace(x) for x in matches]
+            return local_vars['txt']
 
     def merge_nonbody_blocks(self, tree, sub_component_tree):
         # auxiliary map that maps child->parent element,

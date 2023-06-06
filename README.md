@@ -156,7 +156,7 @@ What to know when coding a **Component decorator** and **class**
 | tag         | To be used as the tag in the .xml templates.                                                                                                                                                                                                                                                                                                                        |
 | extends     | References the parent template. This component body is appended to the "parent" body.
 | Components  | References to the classes/components to be used as subcomponents in this component.
-| Defaults    | Configs that can be referenced in the template using ``${conf}``, and can be (re)configured when launching the platform. 
+| Defaults    | Configs that can be referenced in the template using ``{conf}``, and can be (re)configured when launching the platform. 
 | Interfaces  | MuJoCo ``interface_mjc`` or Real Hardware ``interface_hw`` interfaces, used to interface with the real/sim platforms. Before instantiating the component, Yarok merges the appropriate environment interface with the component class, effectively becoming one. Thus, the component class should declare the interface(s) common public methods (api) as empty/pass for static typing.
 | Template    | The component is described in .xml, using the MJCF format (from MuJoCo), with aditional options for component composition and passing variables. At runtime, Yarok handles the nesting of components, renaming / namespacing to avoid name collisions. (# language=xml can be prepended for syntax highlight in PyCharm) 
 | Class       | The Python class used to interface with the component programmatically.                                                                                                                                                                                                                                                                                                                        |
@@ -177,11 +177,11 @@ What to know when coding a **Component decorator** and **class**
 
 ```
   <geom pos="
-            ${0.5 + 0.082*x if z % 2 == 0 else 0.58} 
-            ${0.48 if z % 2 == 0 else 0.4 + 0.082*x}
-            ${0.061*z}" />
+            {0.5 + 0.082*x if z % 2 == 0 else 0.58} 
+            {0.48 if z % 2 == 0 else 0.4 + 0.082*x}
+            {0.061*z}" />
 ```
-You can use `${}` to have python expressions evaluated within the template. 
+You can use `{}` (`${}` is deprecated) to have python expressions evaluated within the template. 
 You can use variables here, from the config/defaults or the tree context.
 ### If block and attribute
 ```
@@ -389,11 +389,10 @@ Current plugins
 A Plugin, can be any Python class that implements a ``step()`` method.
 
 ## Todo list
-- Add probe to interface decorator
-- Behaviour to each component vs single behaviour. (Problems with platform.wait?) 
 - Handle/rename MuJoCo defaults / classes  
+- Behaviour to each component vs single behaviour. (Problems with platform.wait?) 
+- Add probe to interface decorator
 - Handle compiler options
-- Review documentation README.md
 - Add support for mujoco's native include
 
 
