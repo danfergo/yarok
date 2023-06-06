@@ -160,29 +160,23 @@ class UR5eInterfaceMJC:
     def ik(self, xyz=None, xyz_angles=None):
         c_transformation_matrix = self.get_transformation_matrix(self.q)
         current_xyz, current_xyz_angles = self.get_pose_vectors(c_transformation_matrix)
-        q_xyz = current_xyz if xyz is None else np.add(current_xyz, xyz)
-        q_xyz_angles = current_xyz_angles if xyz_angles is None else np.add(current_xyz_angles, xyz_angles)
+        q_xyz = xyz if xyz is not None else current_xyz
+        q_xyz_angles = xyz_angles if xyz_angles is not None else current_xyz_angles
         transformation_matrix = self.compute_transformation_matrix(q_xyz, q_xyz_angles)
         return self.compute_ik(transformation_matrix)
 
     def move_xyz_delta(self, xyz=None, xyz_angles=None):
-        q = self.ik(xyz, xyz_angles)
+        c_transformation_matrix = self.get_transformation_matrix(self.q)
+        current_xyz, current_xyz_angles = self.get_pose_vectors(c_transformation_matrix)
+        new_xyz = current_xyz if xyz is None else np.add(current_xyz, xyz)
+        new_xyz_angles = current_xyz_angles if xyz_angles is None else np.add(current_xyz_angles, xyz_angles)
+        q = self.ik(new_xyz, new_xyz_angles)
 
         if q is not None:
             return self.move_q(q)
 
     def move_xyz(self, xyz=None, xyz_angles=None):
-        # xyz = [0.3, 0.3, 0.2]
-        # xyz_angles = [pi/2, pi/2 , 0]
-        # xyz = None
-        # xyz_angles = None
-        c_transformation_matrix = self.get_transformation_matrix(self.q)
-        current_xyz, current_xyz_angles = self.get_pose_vectors(c_transformation_matrix)
-        q_xyz = xyz or current_xyz
-        q_xyz_angles = xyz_angles or current_xyz_angles
-        # print('CURRENT ANGLES', current_xyz_angles, q_xyz_angles)
-        transformation_matrix = self.compute_transformation_matrix(q_xyz, q_xyz_angles)
-        q = self.compute_ik(transformation_matrix)
+        q = self.ik(xyz, xyz_angles)
 
         if q is not None:
             return self.move_q(q)
