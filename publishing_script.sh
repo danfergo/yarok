@@ -4,7 +4,7 @@ rm -rf build && rm -rf dist
 rm -rf yarok/comm/components/ur5e/ikfastpy
 
 
-PATCH=31
+PATCH=32
 VERSION="0.0."$PATCH
 
 PREV_PATCH=
@@ -28,4 +28,4 @@ git commit -m "updating version to "$VERSION
 python3 setup.py sdist bdist_wheel
 twine upload dist/*
 
-#git push origin master
+git push origin master
