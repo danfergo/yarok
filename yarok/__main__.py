@@ -10,7 +10,7 @@ import importlib.util
 import sys
 from enum import Enum
 
-from .cli import generate_template
+from .cli.generate import generate_template
 
 
 # adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
