@@ -23,6 +23,8 @@ dependencies:
   - zlib=1.2.13=h5eee18b_0
   - pip:
       - bleach==6.0.0
+      - bump2version==1.0.1
+      - bumpversion==0.6.0
       - certifi==2023.5.7
       - cffi==1.15.1
       - charset-normalizer==3.1.0
