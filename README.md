@@ -397,6 +397,9 @@ A Plugin, can be any Python class that implements a ``step()`` method.
 
 
 ## Quick bugfixes
+- For: `libGL error: MESA-LOADER: failed to open swrast: /usr/lib/dri/swrast_dri.so: cannot open shared object file` <br>
+  Check where's your libstdc++.so.6: `find / -name libstdc++.so.6 2>/dev/null` <br>
+  Then: `echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6' > ~/.bashrc` [stackoverflow](https://stackoverflow.com/questions/71010343/cannot-load-swrast-and-iris-drivers-in-fedora-35/72200748#72200748)
 - If having conflicts after installing **cv2**, comment import imageio
 - On MuJoCo 1.0 (pre deepmind aquisition), the following
   export ``export LD_PRELOAD='/usr/lib/x86_64-linux-gnu/libGLEW.so' `` was used to successfully have the simulation
