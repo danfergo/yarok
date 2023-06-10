@@ -10,7 +10,7 @@ import importlib.util
 import sys
 from enum import Enum
 
-from .cli.generate import generate_template
+from .cli.generate import generate
 
 
 # adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
@@ -61,7 +61,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == 'g':
-        generate_template(args.arg0)
+        generate(args.arg0)
     elif args.version:
         print('Version ' + __VERSION__)
     else:
