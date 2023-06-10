@@ -10,6 +10,8 @@ import importlib.util
 import sys
 from enum import Enum
 
+from cli import generate
+
 
 # adapted from https://stackoverflow.com/questions/19053707/converting-snake-case-to-lower-camel-case-lowercamelcase
 def to_camel_case(snake_str):
@@ -50,24 +52,20 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', choices=['run'])
-    parser.add_argument('component', type=str)
+    parser.add_argument('command', choices=['g', 'run'])
+    parser.add_argument('arg0', type=str)
 
     parser.add_argument('-V', '--version', action='store_true', default=False,
                         help='display version information and exit')
 
     args = parser.parse_args()
 
-    if args.version:
+    if args.command == 'g':
+        generate(args.arg0)
+    else if args.version:
         print('Version ' + __VERSION__)
     else:
-        run({
-            'world': load(args.component),
-            'platform_args': {
-                'viewer_mode': 'view'
-            }
-        })
-
+        print("We don't have a help menu here. Check our pipy or github.")
 
 if __name__ == '__main__':
     main()
