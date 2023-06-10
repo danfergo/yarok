@@ -7,7 +7,7 @@ rm -rf build && rm -rf dist
 rm -rf yarok/comm/components/ur5e/ikfastpy
 
 
-PATCH=36
+PATCH=37
 VERSION="0.0."$PATCH
 
 PREV_PATCH=
