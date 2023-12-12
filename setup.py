@@ -17,7 +17,7 @@ setup(
     # I'm not sure about the real impact of this flag,
     # but the file extensions to be included are defined in MANIFEST.in
     include_package_data=True,
-    version='0.0.40',
+    version='0.0.41',
     description='YAROK - Yet another robot framework',
     author='danfergo',
     entry_points={
