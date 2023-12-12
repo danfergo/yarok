@@ -3,7 +3,6 @@
 import numpy as np
 import mujoco
 
-
 class InterfaceMJC:
     """
         This Interface serves as a simplified MuJoCo api,

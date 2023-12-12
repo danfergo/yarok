@@ -37,7 +37,7 @@ class PlatformHW(Platform):
         # backwards compatible:
         if not hasattr(self.manager.config(n)['interface_hw'], '__data__'):
             print('[deprecated] interfaces should be annotated with the @interface decorator')
-            return interface_cls(interfaces_mjc[n])
+            return interface_cls()
 
         class_members = {t[0]: t[1] for t in inspect.getmembers(interface_cls)}
         init_members = {t[0]: t[1] for t in inspect.getmembers(class_members['__init__'])}

@@ -2,7 +2,6 @@ from yarok import Platform, PlatformMJC, PlatformHW, component, ConfigBlock, Inj
 
 from yarok.comm.worlds.empty_world import EmptyWorld
 from yarok.comm.components.robotiq_2f85.robotiq_2f85 import Robotiq2f85
-from yarok.comm.components.ur5.ur5 import UR5
 from yarok.comm.components.geltip.geltip import GelTip
 from yarok.comm.components.ur5e.ur5e import UR5e
 from yarok.comm.components.cam.cam import Cam

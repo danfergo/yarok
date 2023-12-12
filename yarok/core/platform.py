@@ -13,6 +13,7 @@ class Platform(ABC):
         self.manager = manager
         self.env_config = env_config
         self.behaviour = behaviour
+        self.behaviour_instance = None
         self.config = env_config['platform'] if 'platform' in env_config else ConfigBlock({})
 
         self.injector = Injector(self, self.manager.components_tree)
@@ -128,6 +129,7 @@ class Platform(ABC):
             bh_config = self.env_config['behaviour']
             bh_injector = Injector(self, self.manager.components_tree, config=bh_config)
             bh = self.behaviour(**bh_injector.get_all(init_annotations))
+            self.behaviour_instance = bh
             if hasattr(bh, 'on_start'):
                 bh.on_start()
 
@@ -139,11 +141,16 @@ class Platform(ABC):
         else:
             self.wait_forever()
 
+        [plugin.on_end() for plugin in self.plugins if hasattr(plugin, 'on_end')]
+
     def wait(self, fn=None, cb=None):
         while True:
             self.step()
             if self.plugins:
                 [(plugin() if callable(plugin) else plugin.step()) for plugin in self.plugins]
+            if self.behaviour_instance is not None and hasattr(self.behaviour_instance, 'step'):
+                self.behaviour_instance.step()
+
             if (fn is None) \
                     or (isinstance(fn, list) and not any([not e() for e in fn])) \
                     or (callable(fn) and fn()):

@@ -300,6 +300,11 @@ class ComponentsManager:
                     # nest in place the "body" of the declared component
                     parent.remove(element)
                     comp_wb = sub_component_tree.find('worldbody')
+
+                    # ??? patch
+                    if parent.tag != 'worldbody':
+                        parent.attrib['name'] = component_name
+
                     parent.extend(comp_wb)
 
                     # further, nests the declared content, in the declared component,

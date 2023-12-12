@@ -46,9 +46,9 @@ class PlatformMJC(Platform):
         self.data = mujoco.MjData(self.model)
 
         self.manager = manager
-        self.viewer = ViewerMJC(self, self.config)
 
         # self.context = MjRenderContextOffscreen(self.sim)
+        self.viewer = ViewerMJC(self, self.config)
 
         interfaces_mjc = {id: InterfaceMJC(id, self)
                           for id, c in self.manager.components.items()
@@ -59,8 +59,11 @@ class PlatformMJC(Platform):
         [interf.on_init() for _, interf in interfaces_mjc.items()]
 
         # ** {'config': config['interfaces'][c['name_path']] or ConfigBlock({})}
+
         self.interfaces = {n: self.init_interface(interfaces_mjc, n, c)
                            for n, c in interfaces_mjc.items()}
+
+        self.viewer.interfaces = self.interfaces
 
         self.init_components(self.interfaces)
 
