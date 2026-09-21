@@ -32,12 +32,12 @@
 
     <asset>
         <!--DIGIT models-->
-        <mesh name="digit_adapter" file="assets/stls/digit_adapter.STL" scale="0.001 0.001 0.001"/>
-        <mesh name="digit_back" file="assets/stls/digit_back.STL" scale="0.001 0.001 0.001"/>
-        <mesh name="digit_glass" file="assets/stls/digit_glass.STL" scale="0.001 0.001 0.003"/>
-        <mesh name="digit_gel" file="assets/stls/digit_glass.STL" scale="0.001 0.001 0.0009"/>
-        <mesh name="digit_gel_cover" file="assets/stls/digit_gel.STL" scale="0.0012 0.0011 0.001"/>
-        <mesh name="digit_curve" file="assets/stls/digit_curve_0_5.STL" scale=".001 .001 .001"/>
+        <mesh name="digit_adapter" file="assets/stls/digit_adapter.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="digit_back" file="assets/stls/digit_back.stl" scale="0.001 0.001 0.001"/>
+        <mesh name="digit_glass" file="assets/stls/digit_glass.stl" scale="0.001 0.001 0.003"/>
+        <mesh name="digit_gel" file="assets/stls/digit_glass.stl" scale="0.001 0.001 0.0009"/>
+        <mesh name="digit_gel_cover" file="assets/stls/digit_gel.stl" scale="0.0012 0.0011 0.001"/>
+        <mesh name="digit_curve" file="assets/stls/digit_curve_0_5.stl" scale=".001 .001 .001"/>
 
         <material name="black_resin" rgba="0.1 0.1 0.1 1"/>
         <material name="gray_elastomer" rgba="0.8 0.8 0.8 1"/>
