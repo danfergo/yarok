@@ -71,7 +71,7 @@ class PlatformMJC(Platform):
         
         name_path = self.manager.get_by_id(n)['name_path']
         runtime_conf = ConfigBlock(
-            self.config['interfaces'][name_path]] if
+            self.config['interfaces'][name_path] if
             'interfaces' in self.config and name_path in self.config['interfaces']
             else {})
 
