@@ -23,6 +23,7 @@ conda env export | head -n -1 > environment.yaml
 git add -A
 git commit -m "saving changes in preparation for version "$VERSION
 
+echo "--- BUMP VERSION ---"
 bumpversion --current-version $PREV_VERSION patch setup.py
 
 git add -A
