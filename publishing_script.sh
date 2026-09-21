@@ -30,7 +30,14 @@ bumpversion --current-version $PREV_VERSION patch setup.py
 git add -A
 git commit -m "updating version to "$VERSION
 
-# python3 setup.py sdist bdist_wheel
+
+echo "--- BUILD ---"
+rm -rf dist build *.egg-info
+python3 -m build
+
+echo "--- TWINE CHECK ---"
+python3 -m twine check dist/*
+
 echo "--- TWINE UPLOAD ---"
 twine upload dist/*
 
