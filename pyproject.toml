@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yarok"
+version = "0.0.41"
+description = "YAROK - Yet another robot framework"
+readme = "README.md"
+requires-python = ">=3.8"
+
+authors = [
+    { name = "danfergo", email = "danfergo@gmail.com" }
+]
+
+keywords = [
+    "yarok",
+    "robot",
+    "framework",
+    "mujoco"
+]
+
+classifiers = []
+
+dependencies = [
+    "mujoco",
+    "mujoco-python-viewer",
+    "pyyaml"
+]
+
+[project.urls]
+Homepage = "https://github.com/danfergo/yarok"
+
+[project.scripts]
+yarok = "yarok.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["yarok", "yarok.*"]

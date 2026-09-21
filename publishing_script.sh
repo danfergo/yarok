@@ -16,6 +16,7 @@ echo "Publishing Yarok=="$VERSION
 
 sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$VERSION+g" yarok/__init__.py
 sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$PREV_VERSION+g" setup.py
+sed -i "s+[0-9]\.[0-9]\.[0-9][0-9]+$PREV_VERSION+g" pyproject.toml
 
 # re-export environment.yaml
 conda env export | head -n -1 > environment.yaml
