@@ -31,6 +31,7 @@ git add -A
 git commit -m "updating version to "$VERSION
 
 # python3 setup.py sdist bdist_wheel
+echo "--- TWINE UPLOAD ---"
 twine upload dist/*
 
 git push origin master
