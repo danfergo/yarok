@@ -68,9 +68,11 @@ class PlatformMJC(Platform):
         self.init_components(self.interfaces)
 
     def init_interface(self, interfaces_mjc, n, c):
+        
+        name_path = self.manager.get_by_id(n)['name_path']
         runtime_conf = ConfigBlock(
-            self.config['interfaces'][c['name_path']] if
-            'interfaces' in self.config and c['name_path'] in self.config['interfaces']
+            self.config['interfaces'][name_path]] if
+            'interfaces' in self.config and name_path in self.config['interfaces']
             else {})
 
         interface_cls = self.manager.config(n)['interface_mjc']

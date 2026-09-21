@@ -57,6 +57,9 @@ class Platform(ABC):
                     },
                     'components': {
 
+                    },
+                    'interfaces': {
+                        
                     }
                 }
             }

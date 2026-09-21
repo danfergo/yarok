@@ -124,6 +124,23 @@ class ComponentsManager:
                 return child
         return None
 
+    def get_by_id(self, id):
+        """
+            Gets a component metadata given its 'id' (e.g. comp#1)
+        """
+        def walk_components(component):
+            if component['id'] == id:
+                return component
+
+            for child in component['children']:
+                ch = walk_components(child)
+                if ch is not None:
+                    return ch
+
+            return None
+
+        return walk_components(self.components_tree)
+
     def data(self, c):
         comp = self.components[c] if self.is_id(c) else c
         return comp['class'].__data__
