@@ -1,4 +1,5 @@
 #!/bin/bash
+export PYTHONNOUSERSITE=1
 
 rm MUJOCO_LOG.TXT
 rm scene.xml
